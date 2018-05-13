@@ -1,0 +1,22 @@
+{
+  "name": "ng2-panzoom",
+  "author": "Tim Underhay",
+  "license": "MIT",
+  "homepage": "https://github.com/kensingtontech/ng2-panzoom",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KensingtonTech/ng2-panzoom.git"
+  },
+  "version": "0.9.0",
+  "dependencies": {
+    "ng2-mousewheel": "^1.0.0 || ^0.9.0",
+    "jquery": "^3.3.1"
+  },
+  "peerDependencies": {
+    "@angular/common": "^6.0.0-rc.0 || ^6.0.0",
+    "@angular/core": "^6.0.0-rc.0 || ^6.0.0"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.0.0"
+  }
+}
