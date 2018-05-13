@@ -6,7 +6,7 @@ import { PanZoomAPI } from './panzoom-api';
 import { Rect } from './panzoom-rect';
 declare var $: any;
 declare var log;
-if (!log) { log = console; }
+// if (!log) { log = console; }
 
 interface ZoomAnimation {
   deltaZoomLevel: number;

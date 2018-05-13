@@ -1,12 +1,12 @@
 # ng2-panzoom
 
-An Angular directive for panning and zooming an element or elements using the mouse and mousewheel.  Code is in place to support touchscreens, but it is completely untested.  It was adapted from the angular-pan-zoom library for AngularJS, but heavily modified.  Many thanks go out to Martin Vindahl Olsen for writing it.
+An Angular directive for panning and zooming an element or elements using the mouse and mousewheel.  Code is in place to support touchscreens, but it is completely untested.  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for writing it.
 
-It is built using Angular CLI 6 library support, so it may not work on Angular versions 2 through 5 (please excuse the 'ng2' moniker).
+It is built using Angular CLI 6 library support, so it may not work with Angular versions 2 through 5 (please excuse the 'ng2' moniker).
 
 ## Features
 * Zoom using mouse wheel, double click, or API controls tied to your own UI
-* Pan using click and drag. When releasing mouse button whilst panning, the pan will come to a gradual stop.
+* Pan using click and drag. When releasing the mouse button whilst panning, the pan will come to a gradual stop.
 
 ### Differences From the Original
 
@@ -72,15 +72,15 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
   template: `
     <pan-zoom [config]="panzoomConfig">
       <div style="position: relative;">
+        <img src="/myimage1.jpg">
       </div>
-
     </pan-zoom>
   `
 })
 
 
 export class MyComponent {
-
+  ...
 }
 ```
 
@@ -93,13 +93,13 @@ Name                                | Type      | Default           | Descriptio
 ----------------------------------- | --------- | ----------------- | -----------
 api                                 | BehaviorSubject\<PanZoomAPI\>   | Not Applicable | Subscribe to this observable to obtain access to the API for controlling panzoom programattically.  See section below on getting at the API
 zoomLevels                          | number    | 5                 | Number of discrete zoom levels, each one representing a scale
-neutralZoomLevel                    | number    | 2                 | The zoom level at which the centents render at 1:1 scale
+neutralZoomLevel                    | number    | 2                 | The zoom level at which the contents render at 1:1 scale
 scalePerZoomLevel                   | number    | 2.0               | The difference in actual scale between two adjacent zoom levels
 initialZoomLevel                    | number    | neutralZoomLevel  | The initially selected zoom level
 initialPanX                         | number    | 0                 | The initial pan in the horizontal direction
 initialPanY                         | number    | 0                 | The initial pan in the vertical direction
 initialZoomToFit                    | rectangle | undefined         | When defined, will initially zoom to fit the given rectangle (see API for explanation of zoom to fit). This overrides the initialZoomLevel, initialPanX, and initialPanY values
-zoomToFitZoomLevelFactor            | number    | 0.95              | A number to indicate how closely zoom to fit will work. 1.0 is perfect fit, lowering the number will reveal a bit of the surrounding contents 
+zoomToFitZoomLevelFactor            | number    | 0.95              | A number to indicate how closely zoom to fit will work. 1.0 is a perfect fit.  Lowering the number will reveal a bit of the surrounding contents
 zoomOnDoubleClick                   | boolean   | true              | Enable or disable zoom in on double click
 zoomButtonIncrement                 | number    | 1.0               | The amount of zoom levels to zoom on double click
 zoomStepDuration                    | number    | 0.2               | Amount of seconds to animate between two adjacent zoom levels
@@ -131,7 +131,7 @@ The panzoom library provides an API for interacting with, observing, and control
 
   * `zoomOut()` - This will zoom the view out from the last zoomed point by one zoom level
 
-  * `zoomToFit(rectangle: Rect, [duration: number])` - Animates the view to focus on a rectangle of the underlying canvas.  **duration** is how long the animation should take (in seconds), and is optional.  **rectangle** is two coordinates on the canvas which the panZoom view is pan/zooming.  It is defined thusly:
+  * `zoomToFit(rectangle: Rect, [duration: number])` - Animates the view to focus on a rectangle of the underlying canvas.  **duration** is how long the animation should take (in seconds), and is optional.  **rectangle** is two coordinates on the canvas which the panZoom view is pan/zooming.  See the below section on PanZoom Interfaces for its definition.
  
   * `resetView()` - A shortcut method to reset the pan and zoom to the initial view defined by **PanZoomConfig.initialZoomToFit**
   
@@ -145,7 +145,7 @@ The panzoom library provides an API for interacting with, observing, and control
 interface PanZoomModel {
   zoomLevel: number;
   isPanning?: boolean;
-  pan: Point; // the current center point of the pan/zoom view
+  pan: Point; // the current centre point of the pan/zoom view
 }
 
 interface Point {
@@ -162,7 +162,7 @@ interface Rect {
 ```
 
 ### Getting at the API
-The panzoom API is exposed as an RXJS observable through the PanZoomConfig class named `api`, to which you simply subscribe to obtain access.  The subject will be triggered immediately upon subscribing, assuming that ng2-panzoom is already initialised.  Because it's a BehaviorSubject, you will always get the API when you subscribe, even if panzoom has already been initialised.
+The panzoom API is exposed as an RXJS observable through the PanZoomConfig class named `api`, to which you simply subscribe to obtain access.  The subject will be triggered immediately upon subscribing, assuming that ng2-panzoom is already initialised.  Because it's a BehaviorSubject, you will always get the API when you subscribe, during or after panzoom's initialisation.
 
 ```typescript
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
@@ -190,7 +190,7 @@ this.panZoomAPI.zoomOut();
 
 
 ## 'Events'
-The PanZoomConfig class has an RXJS observable (`modelChanged`) which can be used to monitor the pan/zoom state from another component.  The observable emits type `PanZoomModel` (see above section on API Interfaces).  For instance, when the zoom level reaches a certain level, you may want to display a custom control or content on your page.  Another use may be to do something when your the panzoom center point is over a certain part of the view.
+The PanZoomConfig class has an RXJS observable (`modelChanged`) which can be used to monitor the pan/zoom state from another component.  The observable emits type `PanZoomModel` (see above section on API Interfaces).  For instance, when the zoom level reaches a certain level, you may want to display a custom control or content on your page.  Another use may be to do something when the panzoom centre point is over a certain part of the view.
 
 ### Example modelChanged Subscription
 ```typescript
@@ -217,5 +217,6 @@ export class MyComponent implements OnInit, OnDestroy {
 
 ## Reference
 
-[The original angular-pan-zoom on GitHub](https://github.com/mvindahl/angular-pan-zoom)
-[ng2-mousewheel Project](https://github.com/KensingtonTech/ng2-mousewheel)
+[ng2-mousewheel project](https://github.com/KensingtonTech/ng2-mousewheel)
+
+[The original angular-pan-zoom project on GitHub](https://github.com/mvindahl/angular-pan-zoom)
