@@ -64,17 +64,23 @@ A configuration object is required, which gets passed in using `[config]="myConf
 
 It also exposes an API which can be used to interact with the pan/zoom view.  The API is obtained through the configuration object (more below).
 
+### Top Tip
+
+Be sure to place your pan-zoom component underneath an element with a definite height/width, like an absolute-positioned div.  You may not see anything if you don't do this.
+
 ```typescript
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 
 @Component({
   selector: 'my-component'
   template: `
-    <pan-zoom [config]="panzoomConfig">
-      <div style="position: relative;">
-        <img src="/myimage1.jpg">
-      </div>
-    </pan-zoom>
+    <div style="position: absolute; top: 100px; bottom: 0; left: 0; right: 0;">
+      <pan-zoom [config]="panzoomConfig">
+        <div style="position: relative;">
+          <img src="/myimage1.jpg">
+        </div>
+      </pan-zoom>
+    </div>
   `
 })
 
@@ -166,10 +172,12 @@ The panzoom API is exposed as an RXJS observable through the PanZoomConfig class
 
 ```typescript
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
+import { Subscription } from 'rxjs';
 
 export class MyComponent implements OnInit, OnDestroy {
  
   private panZoomAPI: PanZoomAPI;
+  private apiSubscription: Subscription;
 
   ngOnInit(): void {
     this.apiSubscription = this.panzoomConfig.api.subscribe( (api: PanZoomAPI) => this.panZoomAPI = api );
