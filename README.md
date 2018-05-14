@@ -184,7 +184,7 @@ export class MyComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.panZoomAPI.unsubscribe();  // don't forget to unsubscribe.  you don't want a memory leak!
+    this.apiSubscription.unsubscribe();  // don't forget to unsubscribe.  you don't want a memory leak!
   }
 
 }
