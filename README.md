@@ -4,6 +4,9 @@ An Angular directive for panning and zooming an element or elements using the mo
 
 It is built using Angular CLI 6 library support, so it may not work with Angular versions 2 through 5 (please excuse the 'ng2' moniker).
 
+## Demo
+Click [here](https://knowledgekta.com/ng2-panzoom-demo) for a demo of the module.  The demo source can be found [here](https://github.com/KensingtonTech/ng2-panzoom-demo).
+
 ## Features
 * Zoom using mouse wheel, double click, or API controls tied to your own UI
 * Pan using click and drag. When releasing the mouse button whilst panning, the pan will come to a gradual stop.
