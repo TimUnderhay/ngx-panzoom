@@ -147,11 +147,11 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     (<any>this.zoomElementRef.nativeElement.style).willChange = 'transform';
 
-    this.animationFrame =   window.requestAnimationFrame ||
+    this.zone.runOutsideAngular( () => this.animationFrame = window.requestAnimationFrame ||
                             (<any>window).webkitRequestAnimationFrame ||
                             (<any>window).mozRequestAnimationFrame ||
                             (<any>window).oRequestAnimationFrame ||
-                            (<any>window).msRequestAnimationFrame;
+                            (<any>window).msRequestAnimationFrame );
 
 
     if (this.isMobileDevice()) {
