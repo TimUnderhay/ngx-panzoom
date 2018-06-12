@@ -275,12 +275,12 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
         this.model.isPanning = false;
 
         if (!this.isMobile) {
-          this.onMouseMoveRemoveFunc = this.renderer.listen('document', 'mousemove', (e: any) => this.onMouseMove(e) ); // leave this on document
-          this.onMouseUpRemoveFunc = this.renderer.listen('document', 'mouseup', () => this.onMouseUp() ); // leave this on document
+          this.onMouseMoveRemoveFunc = this.zone.runOutsideAngular( () =>  this.renderer.listen('document', 'mousemove', (e: any) => this.onMouseMove(e) )); // leave this on document
+          this.onMouseUpRemoveFunc = this.zone.runOutsideAngular( () => this.renderer.listen('document', 'mouseup', () => this.onMouseUp() )); // leave this on document
         }
         else {
-          this.onTouchEndRemoveFunc = this.renderer.listen('document', 'touchend', (e: any) => this.onTouchEnd(e));
-          this.onTouchMoveRemoveFunc = this.renderer.listen('document', 'touchmove', (e: any) => this.onTouchMove(e));
+          this.onTouchEndRemoveFunc = this.zone.runOutsideAngular( () => this.renderer.listen('document', 'touchend', (e: any) => this.onTouchEnd(e)));
+          this.onTouchMoveRemoveFunc = this.zone.runOutsideAngular( () =>  this.renderer.listen('document', 'touchmove', (e: any) => this.onTouchMove(e)));
         }
       }
 
