@@ -26,7 +26,7 @@ interface Position {
   selector: 'pan-zoom',
   // changeDetection: ChangeDetectionStrategy.OnPush,  // we don't want to kill change detection for all elements beneath this.  They can implement OnPush if they want to.  We can get away with this because the kwheel directive runs outside of Angular, so it won't trigger change detection.
   template: `
-<div #frameElement class="pan-zoom-frame" (dblclick)="onDblClick($event)" (kwheel)="onMouseWheel($event)" (mousedown)="onMousedown($event)" style="position:relative; width: 100%; height: 100%; overflow: hidden;">
+<div #frameElement class="pan-zoom-frame" (dblclick)="onDblClick($event)" (kwheel)="onMouseWheel($event)" style="position:relative; width: 100%; height: 100%; overflow: hidden;">
   <div #panElement class="panElement" style="position: absolute; left: 0px; top: 0px;">
     <div #zoomElement class="zoomElement">
       <ng-content></ng-content>
@@ -62,6 +62,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   private zoomAnimation: ZoomAnimation = null;
   private frameElement: JQuery;
   private animationFrame: Function; // reference to the appropriate getAnimationFrame function for the client browser
+  private onMouseDownRemoveFunc: Function;
   private onMouseMoveRemoveFunc: Function;
   private onMouseUpRemoveFunc: Function;
   private onTouchEndRemoveFunc: Function;
@@ -167,6 +168,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       // and will jump when we first spin the mouse wheel to zoom
       this.scale = this.getCssScale(this.base.zoomLevel);
     }
+
+    this.onMouseDownRemoveFunc = this.zone.runOutsideAngular( () =>  this.renderer.listen(this.frameElementRef.nativeElement, 'mousedown', (event: any) => this.onMousedown(event) ) );
 
   }
 
