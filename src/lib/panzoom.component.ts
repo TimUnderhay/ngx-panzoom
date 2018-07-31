@@ -113,7 +113,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     this.api = {
       model: this.model,
       config: this.config,
-      changeZoomLevel: this.changeZoomLevel.bind(this),
+      changeZoomLevel: this.zoomToLevelAndPoint.bind(this),
       zoomIn: this.zoomInToLastClickPoint.bind(this),
       zoomOut: this.zoomOutFromLastClickPoint.bind(this),
       zoomToFit: this.zoomToFit.bind(this),
@@ -927,6 +927,18 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // log.debug('PanZoomComponent: zoomIn(): clickPoint:', clickPoint);
     this.lastTick = performance.now();
     this.changeZoomLevel( this.base.zoomLevel + this.config.zoomButtonIncrement, clickPoint );
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    if (this.config.freeMouseWheel) {
+      this.scale = this.getCssScale(this.base.zoomLevel);
+    }
+  }
+
+
+
+  private zoomToLevelAndPoint(level: number, clickPoint: Point) {
+    // log.debug('PanZoomComponent: zoomInToLastClickPoint(): lastClickPoint', this.lastClickPoint);
+    this.lastTick = performance.now();
+    this.changeZoomLevel( level, clickPoint );
     this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
     if (this.config.freeMouseWheel) {
       this.scale = this.getCssScale(this.base.zoomLevel);
