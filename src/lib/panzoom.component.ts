@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild, Input, Renderer2, NgZone, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild, Input, Renderer2, NgZone } from '@angular/core';
 import { PanZoomConfig } from './panzoom-config';
 import { Point } from './panzoom-point';
 import { PanZoomModel } from './panzoom-model';
@@ -53,8 +53,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   private base: PanZoomModel; // this is what the pan/zoom view is before a zoom animation begins and after it ends.  It also updates with every mouse drag or freeZoom
   private model: PanZoomModel; // this is used for incremental changes to the pan/zoom view during each animation frame.  Setting it will update the pan/zoom coordinates on the next call to syncModelToDom()
   private api: PanZoomAPI;
-  private viewportHeight: number;
-  private viewportWidth: number;
+  private contentHeight: number;
+  private contentWidth: number;
   private lastMouseEventTime: number;
   private previousPosition: Position = null;
   private isDragging = false;
@@ -78,8 +78,9 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   private isZoomingToFit = false;
   private lastClickPoint: Point;
 
-  private maxScale: number; // the highest scale that we will allow in free zoom mode (calculated)
-  private minScale: number; // the smallest scale that we will allow in free zoom mode (calculated)
+  private maxScale: number; // the highest scale (furthest zoomed in) that we will allow in free zoom mode (calculated)
+  private minScale: number; // the smallest scale (furthest zoomed out) that we will allow in free zoom mode (calculated)
+  private minimumAllowedZoomLevel: number;
 
 
 
@@ -102,7 +103,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.model = {
       zoomLevel: this.base.zoomLevel,
-      isPanning: false,     // Only true if panning has actually taken place, not just after mousedown
+      isPanning: false,     // Only true if panning is actually taking place, not just after mousedown
       pan: {
         x: this.base.pan.x,
         y: this.base.pan.y
@@ -131,6 +132,12 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       this.minScale = this.getCssScale(0);
     }
 
+    this.minimumAllowedZoomLevel = 0;
+    if (this.config.keepInBounds) {
+      this.minimumAllowedZoomLevel = this.config.neutralZoomLevel;
+      this.minScale = this.getCssScale(this.config.neutralZoomLevel);
+    }
+
   }
 
 
@@ -139,8 +146,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // log.debug('PanZoomComponent: ngAfterViewInit()');
 
     this.frameElement = $('.pan-zoom-frame');
-    this.viewportHeight = this.zoomElementRef.nativeElement.height;
-    this.viewportWidth = this.zoomElementRef.nativeElement.width;
+    this.contentHeight = $('.zoomElement').children().height();
+    this.contentWidth = $('.zoomElement').children().width();
 
     if (navigator.userAgent.search('Chrome') >= 0) {
       this.isChrome = true;
@@ -313,25 +320,41 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     if (this.config.keepInBounds) {
+      // console.log('PanZoomComponent: onMouseMove(): keepInBounds');
+      // console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
       let topLeftCornerView = this.getViewPosition( { x: 0, y: 0 } );
-      let bottomRightCornerView = this.getViewPosition( { x: this.viewportWidth, y: this.viewportHeight } );
+      // let bottomRightCornerView = this.getViewPosition( { x: this.viewportWidth, y: this.viewportHeight } );
+      let bottomRightCornerView = this.getViewPosition( { x: this.contentWidth, y: this.contentHeight } );
+      // console.log(`topLeftCornerView:`, topLeftCornerView);
+      // console.log(`bottomRightCornerView:`, bottomRightCornerView);
+      // console.log(`dragDelta-pre: `, dragDelta);
+      // let bottomRightCornerView = this.getViewPosition( { x: this.zoomElementRef.nativeElement.offsetWidth, y: this.zoomElementRef.nativeElement.offsetHeight } );
 
       if (topLeftCornerView.x > 0 && dragDelta.x > 0) {
-        dragDelta.x *= Math.min(Math.pow(topLeftCornerView.x, -this.config.keepInBoundsDragPullback), 1);
+        dragDelta.x *= Math.min(1,
+                                Math.pow(topLeftCornerView.x, -this.config.keepInBoundsDragPullback)
+                               );
       }
 
       if (topLeftCornerView.y > 0 && dragDelta.y > 0) {
-        dragDelta.y *= Math.min(Math.pow(topLeftCornerView.y, -this.config.keepInBoundsDragPullback), 1);
+        dragDelta.y *= Math.min(1,
+                                  Math.pow(topLeftCornerView.y, -this.config.keepInBoundsDragPullback)
+                                );
       }
 
-      if (bottomRightCornerView.x < this.viewportWidth && dragDelta.x < 0) {
-        dragDelta.x *= Math.min(Math.pow(this.viewportWidth - bottomRightCornerView.x, -this.config.keepInBoundsDragPullback), 1);
+      if (bottomRightCornerView.x < this.contentWidth && dragDelta.x < 0) {
+        dragDelta.x *= Math.min(1,
+                                  Math.pow(this.contentWidth - bottomRightCornerView.x, -this.config.keepInBoundsDragPullback)
+                               );
       }
 
-      if (bottomRightCornerView.y < this.viewportHeight && dragDelta.y < 0) {
-        dragDelta.y *= Math.min(Math.pow(this.viewportHeight - bottomRightCornerView.y, -this.config.keepInBoundsDragPullback), 1);
+      if (bottomRightCornerView.y < this.contentHeight && dragDelta.y < 0) {
+        dragDelta.y *= Math.min(1,
+                                 Math.pow(this.contentHeight - bottomRightCornerView.y, -this.config.keepInBoundsDragPullback)
+                               );
       }
     }
+    // console.log(`dragDelta-post: `, dragDelta);
 
     this.pan(dragDelta);
     this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
@@ -566,9 +589,10 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.config.keepInBounds && !this.isDragging) {
+      // console.log('PanZoomComponent: animationTick(): keepInBounds');
       // log.debug('got to 0.3');
       let topLeftCornerView = this.getViewPosition({ x: 0, y: 0 });
-      let bottomRightCornerView = this.getViewPosition({ x: this.viewportWidth, y: this.viewportHeight });
+      let bottomRightCornerView = this.getViewPosition({ x: this.contentWidth, y: this.contentHeight });
 
       if (topLeftCornerView.x > 0) {
         this.base.pan.x -= this.config.keepInBoundsRestoreForce * topLeftCornerView.x;
@@ -578,12 +602,12 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
         this.base.pan.y -= this.config.keepInBoundsRestoreForce * topLeftCornerView.y;
       }
 
-      if (bottomRightCornerView.x < this.viewportWidth) {
-        this.base.pan.x -= this.config.keepInBoundsRestoreForce * (bottomRightCornerView.x - this.viewportWidth);
+      if (bottomRightCornerView.x < this.contentWidth) {
+        this.base.pan.x -= this.config.keepInBoundsRestoreForce * (bottomRightCornerView.x - this.contentWidth);
       }
 
-      if (bottomRightCornerView.y < this.viewportHeight) {
-        this.base.pan.y -= this.config.keepInBoundsRestoreForce * (bottomRightCornerView.y - this.viewportHeight);
+      if (bottomRightCornerView.y < this.contentHeight) {
+        this.base.pan.y -= this.config.keepInBoundsRestoreForce * (bottomRightCornerView.y - this.contentHeight);
       }
     }
 
@@ -643,8 +667,9 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       };
 
       if (this.config.keepInBounds && !this.isZoomingToFit) {
+        // console.log('PanZoomComponent: syncModelToDOM(): keepInBounds');
         let topLeftCornerView = this.getViewPosition({ x: 0, y: 0 });
-        let bottomRightCornerView = this.getViewPosition({ x: this.viewportWidth, y: this.viewportHeight });
+        let bottomRightCornerView = this.getViewPosition({ x: this.contentWidth, y: this.contentHeight });
 
         if (topLeftCornerView.x > 0) {
           this.model.pan.x = 0;
@@ -654,12 +679,12 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
           this.model.pan.y = 0;
         }
 
-        if (bottomRightCornerView.x < this.viewportWidth) {
-          this.model.pan.x -= (bottomRightCornerView.x - this.viewportWidth);
+        if (bottomRightCornerView.x < this.contentWidth) {
+          this.model.pan.x -= (bottomRightCornerView.x - this.contentWidth);
         }
 
-        if (bottomRightCornerView.y < this.viewportHeight) {
-          this.model.pan.y -= (bottomRightCornerView.y - this.viewportHeight);
+        if (bottomRightCornerView.y < this.contentHeight) {
+          this.model.pan.y -= (bottomRightCornerView.y - this.contentHeight);
         }
       }
     }
@@ -759,10 +784,45 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
 
+  private zoomToFitModel(target: PanZoomModel, duration: number = null) {
+    // console.log('PanZoomComponent: zoomToFitModel(): target:', target);
+
+    if (this.config.freeMouseWheel) {
+      this.scale = this.getCssScale(this.base.zoomLevel);
+    }
+    // target.pan.x is the panElement left style property
+    // target.pan.y is the panElement top style property
+    this.lastTick = performance.now();
+    this.animateToTarget(target, duration);
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+  }
+
+
+
   private resetView() {
-    // Only use if config.initialZoomToFit is set
-    // log.debug('PanZoomComponent: resetView()');
-    this.zoomToFit(this.config.initialZoomToFit);
+    // console.log('PanZoomComponent: resetView()');
+    if (this.config.initialZoomToFit) {
+      // console.log('PanZoomComponent: resetView(): got to 1');
+      this.zoomToFit(this.config.initialZoomToFit);
+    }
+    else if (this.config.initialPanX !== null && this.config.initialPanY !== null && this.config.initialZoomLevel !== null) {
+      // console.log('PanZoomComponent: resetView(): got to 2');
+      this.zoomToFitModel(
+        {
+          zoomLevel: this.config.initialZoomLevel,
+          pan: {
+            x: this.config.initialPanX,
+            y: this.config.initialPanY
+          }
+        }
+      );
+    }
+    else {
+      console.error('PanZoomComponent: resetView() could not reset view as some vars were not set.  The culprits are either config.initialZoomLevel, config.initialPanX, or config.initialPanY.  Or just set panzoomConfig.initialZoomToFit');
+      console.log('config.initialZoomLevel: ' + this.config.initialZoomLevel);
+      console.log('config.initialPanX: ' + this.config.initialPanX);
+      console.log('config.initialPanY: ' + this.config.initialPanY);
+    }
   }
 
 
@@ -790,22 +850,26 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
 
-  private getViewPosition(modelPosition: Point) {
+  private getViewPosition(modelPosition: Point): Point {
     // log.debug('PanZoomComponent: getViewPosition()');
-    //  p' = p * s + t
-    let p = modelPosition;
-    let s = this.getCssScale(this.base.zoomLevel);
-    let t = this.base.pan;
+    // p' = p * s + t
+    // viewPosition = modelPosition * scale + basePan
+
+    let scale, translation;
 
     if (this.zoomAnimation) {
-      s = this.getCssScale(this.base.zoomLevel + this.zoomAnimation.deltaZoomLevel * this.zoomAnimation.progress);
-      let deltaT = this.zoomAnimation.translationFromZoom(this.model.zoomLevel);
-      t = { x: this.base.pan.x + deltaT.x, y: this.base.pan.y + deltaT.y };
+      scale = this.getCssScale(this.base.zoomLevel + this.zoomAnimation.deltaZoomLevel * this.zoomAnimation.progress);
+      let deltaTranslation = this.zoomAnimation.translationFromZoom(this.model.zoomLevel);
+      translation = { x: this.base.pan.x + deltaTranslation.x, y: this.base.pan.y + deltaTranslation.y };
+    }
+    else {
+      scale = this.getCssScale(this.base.zoomLevel);
+      translation = this.base.pan;
     }
 
     return {
-      x: p.x * s + t.x,
-      y: p.y * s + t.y
+      x: modelPosition.x * scale + translation.x,
+      y: modelPosition.y * scale + translation.y
     };
   }
 
@@ -832,13 +896,13 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // then we must CSS scale by the min of W/w and H/h in order to just fit the rectangle
     // returns the target left and top coordinates for the panElement and target zoomLevel
 
-    let W = this.frameElementRef.nativeElement.offsetWidth;
-    let H = this.frameElementRef.nativeElement.offsetHeight;
+    let viewportWidth = this.frameElementRef.nativeElement.offsetWidth;
+    let viewportHeight = this.frameElementRef.nativeElement.offsetHeight;
 
-    let w = rect.width;
-    let h = rect.height;
+    let targetWidth = rect.width;
+    let targetHeight = rect.height;
 
-    let cssScaleExact = Math.min( W / w, H / h );
+    let cssScaleExact = Math.min( viewportWidth / targetWidth, viewportHeight / targetHeight );
     let zoomLevelExact = this.getZoomLevel(cssScaleExact);
     let zoomLevel = zoomLevelExact * this.config.zoomToFitZoomLevelFactor;
     let cssScale = this.getCssScale(zoomLevel);
@@ -850,8 +914,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     return {
         zoomLevel: zoomLevel,
         pan: {
-            x: -rect.x * cssScale + (W - w * cssScale) / 2,
-            y: -rect.y * cssScale + (H - h * cssScale) / 2
+            x: -rect.x * cssScale + (viewportWidth - targetWidth * cssScale) / 2,
+            y: -rect.y * cssScale + (viewportHeight - targetHeight * cssScale) / 2
         }
     };
   }
@@ -872,9 +936,10 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let s1 = wheelDelta * this.config.freeMouseWheelFactor * this.scale + this.scale;
 
+    // takes either the minimum scale (furthest allowable zoomed out) or the calculated current scale, whichever is greater, unless calculated current scale exceeds maxScale (furthest allowable zoomed in), in which case maxScale is used
     s1 = Math.max(this.minScale, Math.min( this.maxScale, s1 ));
     this.scale = s1;
-    // log.debug('scale:', this.scale);
+    // console.log('scale:', this.scale);
 
     let t1: Point = {
       // The target point to zoom to.  It must stay the same as the untranslated point
@@ -918,6 +983,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     this.base.pan = t1;
     this.base.zoomLevel = this.getZoomLevel(this.scale);
     this.config.modelChanged.next(this.base);
+    // console.log('zoomLevel:', this.base.zoomLevel);
     // log.debug(`PanZoomComponent: freeZoom(): baseAfterZoom: x: ${this.base.pan.x} y: ${this.base.pan.y} zoomlevel: ${this.base.zoomLevel}` );
   }
 
@@ -936,7 +1002,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   private zoomToLevelAndPoint(level: number, clickPoint: Point) {
-    // log.debug('PanZoomComponent: zoomInToLastClickPoint(): lastClickPoint', this.lastClickPoint);
+    // log.debug('PanZoomComponent: zoomToLevelAndPoint(): level:', level);
+    // log.debug('PanZoomComponent: zoomToLevelAndPoint(): clickPoint:', clickPoint);
     this.lastTick = performance.now();
     this.changeZoomLevel( level, clickPoint );
     this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
@@ -1037,8 +1104,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // keep zoom level in bounds
-    let minimumAllowedZoomLevel = this.config.keepInBounds ? this.config.neutralZoomLevel : 0;
-    newZoomLevel = Math.max(minimumAllowedZoomLevel, newZoomLevel);
+    newZoomLevel = Math.max(this.minimumAllowedZoomLevel, newZoomLevel);
     newZoomLevel = Math.min(this.config.zoomLevels - 1, newZoomLevel);
     // log.debug('newZoomLevel:', newZoomLevel);
 

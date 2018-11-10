@@ -16,7 +16,7 @@ Click [here](https://knowledgekta.com/ng2-panzoom-demo) for a demo of the module
 * The pan-zoom service has been eliminated.
 * **Free zoom** - zooming is no longer limited to switching between two distinct zoom levels.  Zoom can now be smoothly and freely controlled using the mouse wheel.
 * `zoomToFit()` animation - using the zoomToFit() function now will animate the view to the the desired rectangle.
-* A convenience method `resetView()` has been provided to reset the view back to its original `initialZoomToFit` settings
+* A convenience method `resetView()` has been provided to reset the view back to its original settings
 * The `zoomIn()` and `zoomOut()` API functions now zoom to the last zoomed point rather than the centre point, unless no zoom point has been defined yet.
 * The widget has not been migrated from the original project, though this probably shouldn't be hard to do.  Pull requests are welcome!
 * Performance improvements
@@ -101,7 +101,7 @@ The following attributes are defined:
 Name                                | Type      | Default           | Description
 ----------------------------------- | --------- | ----------------- | -----------
 api                                 | BehaviorSubject\<PanZoomAPI\>   | Not Applicable | Subscribe to this observable to obtain access to the API for controlling panzoom programattically.  See section below on getting at the API
-zoomLevels                          | number    | 5                 | Number of discrete zoom levels, each one representing a scale
+zoomLevels                          | number    | 5                 | Number of discrete zoom levels, each one representing a scale.  The higher the number, the more zoomed in it is
 neutralZoomLevel                    | number    | 2                 | The zoom level at which the contents render at 1:1 scale
 scalePerZoomLevel                   | number    | 2.0               | The difference in actual scale between two adjacent zoom levels
 initialZoomLevel                    | number    | neutralZoomLevel  | The initially selected zoom level
@@ -124,7 +124,7 @@ modelChanged                        | Subject<PanZoomModel>   | Not Applicable  
 useHardwareAcceleration             | boolean   | true              | Use translate3d for panning instead of using standard CSS styles 'left' and 'top'. This is intended to trigger hardware acceleration and may increase the speed greatly. In future versions, this may be set to true as default
 chromeUseTransform                  | boolean   | true              | Cause Chrome to use CSS transform instead of CSS zoom. Enable if you use nested SVG and see performance problems in Chrome
 keepInBounds                        | boolean   | false             | When true, it will not be possible to pan the contents off the screen -- it will snap back when trying to do so -- and it will not be possible to zoom further out than the neutral zoom level
-keepInBoundsRestoreForce            | number    | 0.5               | Constant to control how quickly the contents snap back in place after attempting to pan off bounds
+keepInBoundsRestoreForce            | number    | 0.5               | Constant to control how quickly the contents snap back in place after attempting to pan out of bounds
 keepInBoundsDragPullback            | number    | 0.7               | Constant to control the perceived force preventing dragging the contents off limits
 
 ## API
@@ -142,7 +142,7 @@ The panzoom library provides an API for interacting with, observing, and control
 
   * `zoomToFit(rectangle: Rect, [duration: number])` - Animates the view to focus on a rectangle of the underlying canvas.  **duration** is how long the animation should take (in seconds), and is optional.  **rectangle** is two coordinates on the canvas which the panZoom view is pan/zooming.  See the below section on PanZoom Interfaces for its definition.
  
-  * `resetView()` - A shortcut method to reset the pan and zoom to the initial view defined by **PanZoomConfig.initialZoomToFit**
+  * `resetView()` - A shortcut method to reset the pan and zoom back to the initial view
   
   * `getViewPosition(modelPosition: Point)` - By passing in x,y coordinates of the original, untransformed content canvas, it will return the current pixel position of this point
   
