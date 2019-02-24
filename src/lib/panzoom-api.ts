@@ -11,4 +11,8 @@ export interface PanZoomAPI {
   getViewPosition: Function;
   getModelPosition: Function;
   resetView: Function;
+  panToPoint: Function;
+  panDelta: Function;
+  panDeltaPercent: Function;
+  panDeltaAbsolute: Function;
 }

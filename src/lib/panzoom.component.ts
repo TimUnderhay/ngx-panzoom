@@ -10,7 +10,7 @@ declare var log;
 
 interface ZoomAnimation {
   deltaZoomLevel: number;
-  translationFromZoom: Function;
+  panStepFunc: Function;
   duration: number;
   progress: number;
 }
@@ -24,7 +24,7 @@ interface Position {
 @Component( {
   // tslint:disable-next-line:component-selector
   selector: 'pan-zoom',
-  // changeDetection: ChangeDetectionStrategy.OnPush,  // we don't want to kill change detection for all elements beneath this.  They can implement OnPush if they want to.  We can get away with this because the kwheel directive runs outside of Angular, so it won't trigger change detection.
+  // we don't want to kill change detection for all elements beneath this, so we don't set OnPush.  Child views can implement OnPush if the developer wants to.  We can get away with this because the kwheel directive runs outside of Angular, so it doesnt trigger change detection.
   template: `
 <div #frameElement class="pan-zoom-frame" (dblclick)="onDblClick($event)" (kwheel)="onMouseWheel($event)" style="position:relative; width: 100%; height: 100%; overflow: hidden;">
   <div #panElement class="panElement" style="position: absolute; left: 0px; top: 0px;">
@@ -51,17 +51,19 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() private config: PanZoomConfig;
 
   private base: PanZoomModel; // this is what the pan/zoom view is before a zoom animation begins and after it ends.  It also updates with every mouse drag or freeZoom
-  private model: PanZoomModel; // this is used for incremental changes to the pan/zoom view during each animation frame.  Setting it will update the pan/zoom coordinates on the next call to syncModelToDom()
+  private model: PanZoomModel; // this is used for incremental changes to the pan/zoom view during each animation frame.  Setting it will update the pan/zoom coordinates on the next call to updateDOM().  Not used during mouse drag or freeZoom
   private api: PanZoomAPI;
   private contentHeight: number;
   private contentWidth: number;
+  private frameHeight: number;
+  private frameWidth: number;
   private lastMouseEventTime: number;
   private previousPosition: Position = null;
   private isDragging = false;
   private panVelocity: Point = null;
-  private zoomAnimation: ZoomAnimation = null;
+  private animationParams: ZoomAnimation = null;
   private frameElement: JQuery;
-  private animationFrame: Function; // reference to the appropriate getAnimationFrame function for the client browser
+  private animationFrameFunc: Function; // reference to the appropriate getAnimationFrame function for the client browser
   private onMouseDownRemoveFunc: Function;
   private onMouseMoveRemoveFunc: Function;
   private onMouseUpRemoveFunc: Function;
@@ -110,6 +112,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
 
+    this.config.modelChanged.next(this.model);
+
     // create public API
     this.api = {
       model: this.model,
@@ -120,7 +124,11 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       zoomToFit: this.zoomToFit.bind(this),
       resetView: this.resetView.bind(this),
       getViewPosition: this.getViewPosition.bind(this),
-      getModelPosition: this.getModelPosition.bind(this)
+      getModelPosition: this.getModelPosition.bind(this),
+      panToPoint: this.panToPoint.bind(this),
+      panDelta: this.panDelta.bind(this),
+      panDeltaPercent: this.panDeltaPercent.bind(this),
+      panDeltaAbsolute: this.panDeltaAbsolute.bind(this)
     };
 
     this.config.api.next(this.api);
@@ -148,6 +156,10 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     this.frameElement = $('.pan-zoom-frame');
     this.contentHeight = $('.zoomElement').children().height();
     this.contentWidth = $('.zoomElement').children().width();
+    this.frameHeight = this.frameElement.height();
+    this.frameWidth = this.frameElement.width();
+    // console.log('frameHeight:', this.frameHeight);
+    // console.log('frameWidth:', this.frameWidth);
 
     if (navigator.userAgent.search('Chrome') >= 0) {
       this.isChrome = true;
@@ -155,7 +167,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     (<any>this.zoomElementRef.nativeElement.style).willChange = 'transform';
 
-    this.zone.runOutsideAngular( () => this.animationFrame = window.requestAnimationFrame ||
+    this.zone.runOutsideAngular( () => this.animationFrameFunc = window.requestAnimationFrame ||
                             (<any>window).webkitRequestAnimationFrame ||
                             (<any>window).mozRequestAnimationFrame ||
                             (<any>window).oRequestAnimationFrame ||
@@ -167,7 +179,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       this.touchStartRemoveFunc = this.zone.runOutsideAngular( () =>  this.renderer.listen(this.el.nativeElement, 'touchstart', (event: any) => this.onTouchStart(event) ) );
     }
 
-    this.syncModelToDOM(); // this is needed to apply the initial pan / zoom view set in OnInit
+    this.updateDOM(); // this is needed to apply the initial pan / zoom view set in OnInit
     this.isFirstSync = false;
     if (this.config.freeMouseWheel) {
       // if we don't do this here,
@@ -187,7 +199,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.touchStartRemoveFunc) {
       this.touchStartRemoveFunc();
     }
-    if (this.animationFrame && this.animationId) {
+    if (this.animationFrameFunc && this.animationId) {
       window.cancelAnimationFrame(this.animationId);
     }
   }
@@ -220,7 +232,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.config.zoomOnMouseWheel) {
       // event.preventDefault();
 
-      if (this.zoomAnimation) {
+      if (this.animationParams) {
         return; // already zooming
       }
 
@@ -280,13 +292,13 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
           x: event.pageX,
           y: event.pageY
         };
-        this.lastMouseEventTime = (new Date).getTime();
+        this.lastMouseEventTime = event.timeStamp;
         this.isDragging = true;
         this.model.isPanning = false;
 
         if (!this.isMobile) {
           this.onMouseMoveRemoveFunc = this.zone.runOutsideAngular( () =>  this.renderer.listen('document', 'mousemove', (e: any) => this.onMouseMove(e) )); // leave this on document
-          this.onMouseUpRemoveFunc = this.zone.runOutsideAngular( () => this.renderer.listen('document', 'mouseup', () => this.onMouseUp() )); // leave this on document
+          this.onMouseUpRemoveFunc = this.zone.runOutsideAngular( () => this.renderer.listen('document', 'mouseup', (e: any) => this.onMouseUp(e) )); // leave this on document
         }
         else {
           this.onTouchEndRemoveFunc = this.zone.runOutsideAngular( () => this.renderer.listen('document', 'touchend', (e: any) => this.onTouchEnd(e)));
@@ -307,10 +319,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // event.preventDefault();
     event.stopPropagation();
 
-    // log.debug(`onMouseMove(): pageX: ${event.pageX} pageY: ${event.pageY}`);
-    // log.debug(`onMouseMove(): base.pan.x: ${this.base.pan.x} base.pan.y: ${this.base.pan.y}`);
-
-    let now = (new Date).getTime();
+    let now = event.timeStamp;
     let timeSinceLastMouseEvent = (now - this.lastMouseEventTime) / 1000;
     this.lastMouseEventTime = now;
     let dragDelta = {
@@ -320,15 +329,9 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     if (this.config.keepInBounds) {
-      // console.log('PanZoomComponent: onMouseMove(): keepInBounds');
-      // console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
       let topLeftCornerView = this.getViewPosition( { x: 0, y: 0 } );
-      // let bottomRightCornerView = this.getViewPosition( { x: this.viewportWidth, y: this.viewportHeight } );
       let bottomRightCornerView = this.getViewPosition( { x: this.contentWidth, y: this.contentHeight } );
-      // console.log(`topLeftCornerView:`, topLeftCornerView);
-      // console.log(`bottomRightCornerView:`, bottomRightCornerView);
-      // console.log(`dragDelta-pre: `, dragDelta);
-      // let bottomRightCornerView = this.getViewPosition( { x: this.zoomElementRef.nativeElement.offsetWidth, y: this.zoomElementRef.nativeElement.offsetHeight } );
+
 
       if (topLeftCornerView.x > 0 && dragDelta.x > 0) {
         dragDelta.x *= Math.min(1,
@@ -354,10 +357,18 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
                                );
       }
     }
-    // console.log(`dragDelta-post: `, dragDelta);
 
-    this.pan(dragDelta);
-    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    // now pan the view
+    let delta: Point = {
+      x: null,
+      y: null
+    };
+    delta.x = dragDelta.x || 0;
+    delta.y = dragDelta.y || 0;
+    this.model.pan.x += delta.x;
+    this.model.pan.y += delta.y;
+    this.syncBaseToModel();
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
 
     if (!this.model.isPanning) {
       // This will improve the performance,
@@ -384,10 +395,10 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
 
-  private onMouseUp() {
+  private onMouseUp(event) {
     // log.debug('PanZoomComponent: onMouseup()');
 
-    let now = (new Date).getTime();
+    let now = event.timeStamp;
     let timeSinceLastMouseEvent = (now - this.lastMouseEventTime) / 1000;
 
     if (this.panVelocity) {
@@ -401,7 +412,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.isDragging = false;
-    this.model.isPanning = false;
+    // this.model.isPanning = false;
 
     if (!this.isMobile) {
       this.onMouseMoveRemoveFunc();
@@ -495,14 +506,14 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private onTouchEnd(event: any) {
     // log.debug('PanZoomComponent: onTouchEnd()');
-    this.onMouseUp();
+    this.onMouseUp(event);
   }
 
 
 
-  private onMouseleave() {
+  private onMouseleave(event) {
     // log.debug('PanZoomComponent: onMouseleave()');
-    this.onMouseUp(); // same behaviour
+    this.onMouseUp(event); // same behaviour
   }
 
 
@@ -517,42 +528,36 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
 
-  private pan(delta: Point): void {
-    // log.debug('PanZoomComponent: pan()');
-    delta.x = delta.x || 0;
-    delta.y = delta.y || 0;
-    this.base.pan.x += delta.x;
-    this.base.pan.y += delta.y;
-    this.syncModelToDOM();
-    // this.config.modelChanged.next(this.model);
+  private syncBaseToModel() {
+    this.base.pan.x = this.model.pan.x;
+    this.base.pan.y = this.model.pan.y;
+    this.base.zoomLevel = this.model.zoomLevel;
   }
 
 
 
-  private animationTick = (timestamp: any) => {
+  private animationTick = (timestamp: number) => {
     // log.debug('PanZoomComponent: animationTick()');
 
     let deltaTime = (timestamp - this.lastTick) / 1000;
 
     this.lastTick = timestamp;
 
-    if (this.zoomAnimation) {
-      // when we're zooming
+    if (this.animationParams) {
+      // when we're running an animation (but not waiting for a released drag to halt)
       // log.debug('PanZoomComponent: animationTick(): model is zooming');
 
-      this.zoomAnimation.progress += Math.abs(deltaTime / this.zoomAnimation.duration);
-      // log.debug('PanZoomComponent: animationTick(): zoomAnimation.progress:', this.zoomAnimation.progress);
+      this.animationParams.progress += Math.abs(deltaTime / this.animationParams.duration);
+      // log.debug('PanZoomComponent: animationTick(): animationParams.progress:', this.animationParams.progress);
 
 
-      if (this.zoomAnimation.progress >= 1.0) {
-        // when the zoom has finished, sync the base to the model.
-        this.zoomAnimation.progress = 1.0;
-        this.syncModelToDOM();
-        this.base.zoomLevel = this.model.zoomLevel;
-        this.base.pan.x = this.model.pan.x;
-        this.base.pan.y = this.model.pan.y;
-        this.zoomAnimation = null;
-        this.config.modelChanged.next(this.model);
+      if (this.animationParams.progress >= 1.0) {
+        // Only when the animation has finished, sync the base to the model.
+        this.animationParams.progress = 1.0;
+        this.updateDOM();
+        this.syncBaseToModel();
+        this.animationParams = null;
+        // this.config.modelChanged.next(this.model);
         if (this.config.freeMouseWheel) {
           this.scale = this.getCssScale(this.base.zoomLevel);
         }
@@ -560,10 +565,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.panVelocity && !this.isDragging) {
-      // log.debug('got to 0.2');
-      // this is when we've panned and released the mouse button and the view is "free-floating" until it slows to a stop
-      // prevent overshooting if delta time is large for some reason. We apply the simple solution of
-      // slicing delta time into smaller pieces and applying each one
+      // this is when we've panned and released the mouse button and the view is "free-floating" until it slows to a halt
+      // prevent overshooting if delta time is large for some reason. We apply the simple solution of slicing delta time into smaller pieces and applying each one
       while (deltaTime > 0) {
         let dTime = Math.min(0.02, deltaTime);
 
@@ -579,18 +582,21 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
         let speed = this.length(this.panVelocity);
 
+        this.model.pan.x = this.base.pan.x;
+        this.model.pan.y = this.base.pan.y;
+
         if (speed < this.config.haltSpeed) {
+          this.model.isPanning = false;
           this.panVelocity = null;
-          this.config.modelChanged.next(this.base);
           break;
         }
+
       }
-      // log.debug(`baseAfterDrag: x: ${this.base.pan.x} y: ${this.base.pan.y} zoomlevel: ${this.base.zoomLevel}` );
     }
 
     if (this.config.keepInBounds && !this.isDragging) {
+      // Checks that keepInBounds is set and that the mouse button isn't pressed, and if so, it stops the contents from going out of view
       // console.log('PanZoomComponent: animationTick(): keepInBounds');
-      // log.debug('got to 0.3');
       let topLeftCornerView = this.getViewPosition({ x: 0, y: 0 });
       let bottomRightCornerView = this.getViewPosition({ x: this.contentWidth, y: this.contentHeight });
 
@@ -611,53 +617,42 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.syncModelToDOM();
+    this.updateDOM();
+    this.config.modelChanged.next(this.model);
 
-    if (this.isDragging) {
-      this.config.modelChanged.next(this.base);
-    }
+    if ( this.animationParams || this.panVelocity ) {
+      // Are we in an animation or panning?  If so, run the next frame
+      // console.log(`animationParams: ${this.animationParams}, panVelocity: ${this.panVelocity}`);
 
-    if ( this.animationFrame && ( this.zoomAnimation || this.panVelocity ) ) {
-      // are we zooming or panning?  If so, do this...
-      // console.log(`zoomAnimation: ${this.zoomAnimation}, panVelocity: ${this.panVelocity}`);
-
-      if (this.isChrome && this.willChangeNextFrame && (this.zoomAnimation || this.isZoomingToFit)) {
+      if (this.isChrome && this.willChangeNextFrame && (this.animationParams || this.isZoomingToFit)) {
         (<any>this.zoomElementRef.nativeElement.style).willChange = 'transform';
         this.willChangeNextFrame = false;
       }
-      if (this.isChrome && !this.willChangeNextFrame && (this.zoomAnimation || this.isZoomingToFit)) {
+      if (this.isChrome && !this.willChangeNextFrame && (this.animationParams || this.isZoomingToFit)) {
         (<any>this.zoomElementRef.nativeElement.style).willChange = null;
         this.willChangeNextFrame = true;
       }
 
-      this.animationFrame(this.animationTick); // Call the next animation frame
+      this.animationFrameFunc(this.animationTick); // Call the next animation frame
     }
 
   }
 
 
 
-  private syncModelToDOM() {
-    // log.debug('PanZoomComponent: syncModelToDOM()');
-    // called by either the animationFrame animationTick() function or by the pan() function or by zoomToFit()
-    // this does not get called by freeZoom(), which operates independently of animationTick() and syncModelToDOM()
-    // log.debug('PanZoomComponent: syncModelToDOM(): base.pan', this.base.pan);
-    // log.debug('PanZoomComponent: syncModelToDOM(): model.pan', this.model.pan);
+  private updateDOM() {
+    // log.debug('PanZoomComponent: updateDOM()');
+    // Called by ngAfterViewInit() and animationTick()
+    // This function does not get called by freeZoom(), which operates independently of animationTick() and updateDOM().
+    // log.debug('PanZoomComponent: updateDOM(): base.pan', this.base.pan);
+    // log.debug('PanZoomComponent: updateDOM(): model.pan', this.model.pan);
     // log.debug('model.pan', this.model.pan);
 
-
-    if (!this.zoomAnimation) {
-      // Just panning.  No zoom
-      // sync model to base
-      this.model.zoomLevel = this.base.zoomLevel;
-      this.model.pan.x = this.base.pan.x;
-      this.model.pan.y = this.base.pan.y;
-    }
-    else {
-      // we're zooming (but not freeZooming)
-      this.model.zoomLevel = this.base.zoomLevel + this.zoomAnimation.deltaZoomLevel * this.zoomAnimation.progress; // calculate how far we need to zoom in or out for the current animationTick
-      let deltaTranslation = this.zoomAnimation.translationFromZoom(this.model.zoomLevel); // calculate how far to pan the view to based on our translated coordinates
-      // log.debug('PanZoomComponent: syncModelToDOM(): deltaTranslation:', deltaTranslation);
+    if (this.animationParams) {
+      // we're running an animation sequence (but not freeZooming or panning with onMouseMove() )
+      this.model.zoomLevel = this.base.zoomLevel + this.animationParams.deltaZoomLevel * this.animationParams.progress; // calculate how far we need to zoom in or out for the current animationTick
+      let deltaTranslation = this.animationParams.panStepFunc(this.model.zoomLevel); // calculate how far to pan the view to based on our translated coordinates
+      // log.debug('PanZoomComponent: updateDOM(): deltaTranslation:', deltaTranslation);
       // log.debug('deltaTranslation:', deltaTranslation);
       this.model.pan = {
         // sync the model pan coordinates to our translated pan coordinates
@@ -667,7 +662,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       };
 
       if (this.config.keepInBounds && !this.isZoomingToFit) {
-        // console.log('PanZoomComponent: syncModelToDOM(): keepInBounds');
+        // console.log('PanZoomComponent: updateDOM(): keepInBounds');
         let topLeftCornerView = this.getViewPosition({ x: 0, y: 0 });
         let bottomRightCornerView = this.getViewPosition({ x: this.contentWidth, y: this.contentHeight });
 
@@ -692,7 +687,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     /////////////////////////////////////////////
     //////////////// APPLY SCALING ////////////////
     /////////////////////////////////////////////
-    if (this.zoomAnimation || this.isFirstSync) {
+    if (this.animationParams || this.isFirstSync) {
       let scale = this.getCssScale(this.model.zoomLevel);
       let scaleString = `scale3d(${scale},${scale},${scale})`;
       if (this.isChrome) {
@@ -779,7 +774,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // target.pan.y is the panElement top style property
     this.lastTick = performance.now();
     this.animateToTarget(target, duration);
-    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
   }
 
 
@@ -794,7 +789,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // target.pan.y is the panElement top style property
     this.lastTick = performance.now();
     this.animateToTarget(target, duration);
-    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
   }
 
 
@@ -857,16 +852,16 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
     let scale, translation;
 
-    if (this.zoomAnimation) {
-      scale = this.getCssScale(this.base.zoomLevel + this.zoomAnimation.deltaZoomLevel * this.zoomAnimation.progress);
-      let deltaTranslation = this.zoomAnimation.translationFromZoom(this.model.zoomLevel);
+    if (this.animationParams) {
+      scale = this.getCssScale(this.base.zoomLevel + this.animationParams.deltaZoomLevel * this.animationParams.progress);
+      let deltaTranslation = this.animationParams.panStepFunc(this.model.zoomLevel);
       translation = { x: this.base.pan.x + deltaTranslation.x, y: this.base.pan.y + deltaTranslation.y };
     }
     else {
       scale = this.getCssScale(this.base.zoomLevel);
       translation = this.base.pan;
     }
-
+ 
     return {
       x: modelPosition.x * scale + translation.x,
       y: modelPosition.y * scale + translation.y
@@ -980,9 +975,10 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    this.base.pan = t1;
-    this.base.zoomLevel = this.getZoomLevel(this.scale);
-    this.config.modelChanged.next(this.base);
+    this.model.pan = t1;
+    this.model.zoomLevel = this.getZoomLevel(this.scale);
+    this.syncBaseToModel();
+    this.config.modelChanged.next(this.model);
     // console.log('zoomLevel:', this.base.zoomLevel);
     // log.debug(`PanZoomComponent: freeZoom(): baseAfterZoom: x: ${this.base.pan.x} y: ${this.base.pan.y} zoomlevel: ${this.base.zoomLevel}` );
   }
@@ -993,7 +989,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // log.debug('PanZoomComponent: zoomIn(): clickPoint:', clickPoint);
     this.lastTick = performance.now();
     this.changeZoomLevel( this.base.zoomLevel + this.config.zoomButtonIncrement, clickPoint );
-    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
     if (this.config.freeMouseWheel) {
       this.scale = this.getCssScale(this.base.zoomLevel);
     }
@@ -1006,7 +1002,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // log.debug('PanZoomComponent: zoomToLevelAndPoint(): clickPoint:', clickPoint);
     this.lastTick = performance.now();
     this.changeZoomLevel( level, clickPoint );
-    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
     if (this.config.freeMouseWheel) {
       this.scale = this.getCssScale(this.base.zoomLevel);
     }
@@ -1018,7 +1014,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // log.debug('PanZoomComponent: zoomInToLastClickPoint(): lastClickPoint', this.lastClickPoint);
     this.lastTick = performance.now();
     this.changeZoomLevel( this.base.zoomLevel + this.config.zoomButtonIncrement, this.lastClickPoint );
-    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
     if (this.config.freeMouseWheel) {
       this.scale = this.getCssScale(this.base.zoomLevel);
     }
@@ -1030,7 +1026,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // log.debug('PanZoomComponent: zoomOut()');
     this.lastTick = performance.now();
     this.changeZoomLevel( this.base.zoomLevel - this.config.zoomButtonIncrement, clickPoint );
-    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
     if (this.config.freeMouseWheel) {
       this.scale = this.getCssScale(this.base.zoomLevel);
     }
@@ -1042,7 +1038,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // log.debug('PanZoomComponent: zoomOutFromLastClickPoint()');
     this.lastTick = performance.now();
     this.changeZoomLevel( this.base.zoomLevel - this.config.zoomButtonIncrement, this.lastClickPoint );
-    this.zone.runOutsideAngular( () => this.animationId = this.animationFrame(this.animationTick) );
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
     if (this.config.freeMouseWheel) {
       this.scale = this.getCssScale(this.base.zoomLevel);
     }
@@ -1050,15 +1046,144 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
 
-  private animateToTarget(target: PanZoomModel, duration = null) {
-    // log.debug('PanZoomComponent: animateToTarget()');
+  private panToPoint(point: Point, duration: number = null) {
+    // log.debug('PanZoomComponent: panToPoint(): point:', point);
 
-    if (this.zoomAnimation) {
+    // API call to animate the view so that the centre point of the view is at the
+    // point parameter coordinates, relative to the original, unzoomed
+    // content width and height
+    // example point: { "x": 0, "y": 0 } // makes the top-left corner of the content
+    // the centre of the view
+
+    if (this.config.freeMouseWheel) {
+      this.scale = this.getCssScale(this.base.zoomLevel);
+    }
+    console.log('contentWidth: ' + this.contentWidth + ' contentHeight: ' + this.contentHeight);
+    console.log('frameWidth: ' + this.frameWidth + ' frameHeight: ' + this.frameHeight);
+    console.log('scale:', this.scale);
+    let target: PanZoomModel = {
+      pan: {
+        x: ( (this.frameWidth / 2) ) - point.x * this.scale,
+        y: ( (this.frameHeight / 2) ) - point.y * this.scale
+      },
+      zoomLevel: this.base.zoomLevel
+    };
+    console.log('target.pan.x: ' + target.pan.x + ' target.pan.y: ' + target.pan.y);
+
+    this.lastTick = performance.now();
+    this.animateToTarget(target, duration);
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
+  }
+
+
+
+  private panDelta(delta: Point, duration: number = null) {
+    // log.debug('PanZoomComponent: panDelta(): delta:', delta);
+
+    // API call to pan the view left, right, up, or down, based on a number of pixels
+    // of the original, unzoomed content.
+    // Positive is right and down
+    // Negative is left and up
+    // example point: { "x": 100, "y": -50 } // moves the view right 50px and up 50px
+
+    if (this.config.freeMouseWheel) {
+      this.scale = this.getCssScale(this.base.zoomLevel);
+    }
+    let target: PanZoomModel = {
+      pan: {
+        x: this.base.pan.x - this.scale * delta.x,
+        y: this.base.pan.y - this.scale * delta.y
+      },
+      zoomLevel: this.base.zoomLevel
+    };
+    // console.log('target.pan.x: ' + target.pan.x + ' target.pan.y: ' + target.pan.y);
+    this.lastTick = performance.now();
+    this.animateToTarget(target, duration);
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
+  }
+
+
+
+  private panDeltaAbsolute(delta: Point, duration: number = null) {
+    // log.debug('PanZoomComponent: panDeltaAbsolute(): delta:', delta);
+
+    // API call to pan the view left, right, up, or down, based on a number of pixels
+    // This method doesn't adjust for scale.  I'm not sure why you'd want this
+    // but have it here just in case someone needs it
+    // Positive is right and down
+    // Negative is left and up
+    // example point: { "x": 100, "y": -50 } // moves the view right 50px and up 50px
+
+    if (this.config.freeMouseWheel) {
+      this.scale = this.getCssScale(this.base.zoomLevel);
+    }
+    let target: PanZoomModel = {
+      pan: {
+        x: this.base.pan.x - delta.x,
+        y: this.base.pan.y - delta.y
+      },
+      zoomLevel: this.base.zoomLevel
+    };
+    // console.log('target.pan.x: ' + target.pan.x + ' target.pan.y: ' + target.pan.y);
+    this.lastTick = performance.now();
+    this.animateToTarget(target, duration);
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
+  }
+
+
+
+  private panDeltaPercent(deltaPercent: Point, duration: number = null) {
+    // log.debug('PanZoomComponent: panDeltaPercent(): deltaPercent:', deltaPercent);
+
+    // API call to pan the view up, down, left, or right, based on a percentage
+    // of the original, unzoomed content width and height
+    // example point: { "x": 10, "y": -20 }
+
+    if (this.config.freeMouseWheel) {
+      this.scale = this.getCssScale(this.base.zoomLevel);
+    }
+    console.log('contentWidth: ' + this.contentWidth + ' contentHeight: ' + this.contentHeight);
+    console.log('scale:', this.scale);
+
+    let deltaX = 0;
+    let deltaY = 0;
+    if (deltaPercent.x !== 0) {
+      deltaX = this.contentWidth * ( deltaPercent.x / 100 ) * this.scale;
+    }
+    if (deltaPercent.y !== 0) {
+      deltaY = this.contentHeight * ( deltaPercent.y / 100 ) * this.scale;
+    }
+    console.log('deltaX: ' + deltaX + ' deltaY: ' + deltaY);
+
+    let target: PanZoomModel = {
+      pan: {
+        x: this.base.pan.x - deltaX,
+        y: this.base.pan.y - deltaY
+      },
+      zoomLevel: this.base.zoomLevel
+    };
+    // target.pan.x is the panElement left style property
+    // target.pan.y is the panElement top style property
+    this.lastTick = performance.now();
+    this.animateToTarget(target, duration);
+    this.zone.runOutsideAngular( () => this.animationId = this.animationFrameFunc(this.animationTick) );
+  }
+
+
+
+  private animateToTarget(targetModel: PanZoomModel, duration = null) {
+    // log.debug('PanZoomComponent: animateToTarget()');
+    // what this function really does is take a target model, and then sets
+    // this.animationParams with the parameters for the whole animation,
+    // namely the delta zoomLevel
+    // it is the responsibility of the caller to kick off the animation with a call to animationFrameFunc()
+
+    if (this.animationParams) {
       // make the user wait for existing animation to finish before clicking
       return;
     }
 
-    let deltaZoomLevel = target.zoomLevel - this.base.zoomLevel; // deltaZoomLevel is the number of zoom levels we are changing here
+    let deltaZoomLevel = targetModel.zoomLevel - this.base.zoomLevel; // deltaZoomLevel is the number of zoom levels we are changing here
 
     let oldBase: Point = {
       // the current base coordinates
@@ -1068,22 +1193,21 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     this.model.pan.x = this.base.pan.x;
     this.model.pan.y = this.base.pan.y;
 
-    let translationFromZoom = (zoomLevel: number) => {
-      // this function gets called during every animation tick in syncModelToDOM(), to calculate where to move the model pan coordinates to (i.e. the translation) for that tick,
-      // where zoomLevel is calculated from the current zoomLevel + the target zoomLevel * the progress of the current animation
-      let t1: Point = {
+    let panStepFunc = (zoomLevel: number) => {
+      // this function gets called during every animation tick in updateDOM(), to calculate where to move the model pan coordinates to (i.e. the translation) for that tick, zoomLevel is ignored within animateToTarget()
+      let targetPoint: Point = {
         // The target point to zoom to for the current animation frame.  It must stay the same as the untranslated point
-        x: (oldBase.x - target.pan.x) * this.zoomAnimation.progress,
-        y: (oldBase.y - target.pan.y) * this.zoomAnimation.progress
+        x: (oldBase.x - targetModel.pan.x) * this.animationParams.progress,
+        y: (oldBase.y - targetModel.pan.y) * this.animationParams.progress
       };
 
-      return { x: -t1.x, y: -t1.y };
+      return { x: -targetPoint.x, y: -targetPoint.y };
     };
 
-    // now rewind to the start of the anim and let it run its course
-    this.zoomAnimation = {
-      deltaZoomLevel: deltaZoomLevel, // the destination zoom level for this zoom operation (when the animation is completed)
-      translationFromZoom: translationFromZoom,
+    // now set the parameters of our new animation
+    this.animationParams = {
+      deltaZoomLevel: deltaZoomLevel, // how many zooom levels to zoom in or out
+      panStepFunc: panStepFunc, // a function which runs on every animation tick, which calcs how much to pan the view on every frame
       duration: duration || this.config.zoomStepDuration, // how long the animation should take
       progress: this.config.disableZoomAnimation ? 1.0 : 0.0 // If zoom animation is disabled set progress to the finished point so that the animation completes on the first tick
     };
@@ -1095,12 +1219,12 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   private changeZoomLevel(newZoomLevel: number, clickPoint: Point) {
     // log.debug('PanZoomComponent: changeZoomLevel()');
 
-    if (this.zoomAnimation) {
+    if (this.animationParams) {
       // cancel any existing zoom animation (if they pressed a zoom button - this shouldn't ever happen on mousewheel)
       this.base.zoomLevel = this.model.zoomLevel;
       this.base.pan.x = this.model.pan.x;
       this.base.pan.y = this.model.pan.y;
-      this.zoomAnimation = null;
+      this.animationParams = null;
     }
 
     // keep zoom level in bounds
@@ -1135,37 +1259,38 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     //  t1 = p' - (s1/s0)*(p' - t0)
     //
 
-    let t0: Point = {
-      // the current base coordinates
+    let currentPan: Point = {
+      // t0 - the current base coordinates
       x: this.base.pan.x,
       y: this.base.pan.y
     };
-    let s0 = this.getCssScale(this.base.zoomLevel); // get the current CSS scale (scale0)
-    let pmark = clickPoint || this.getCenterPoint(); // the point we are aiming to zoom to (either the click point or the centre of the page)
+
+    let currentScale = this.getCssScale(this.base.zoomLevel); // s0 - get the current CSS scale (scale0)
+    let destPoint = clickPoint || this.getCenterPoint(); // pmark - the point we are aiming to zoom to (either the click point or the centre of the page)
 
 
-    let translationFromZoom = (zoomLevel: number) => {
-      // this function gets called during every animation tick, to calculate where to move the model pan coordinates to (i.e. the translation) for that tick,
-      // where zoomLevel is calculated from the current zoomLevel + the target zoomLevel * the progress of the current animation
-      let s1 = this.getCssScale(zoomLevel); // the scale to translate to for the current animation tick
-      let t1: Point = {
-        // The target point to zoom to.  It must stay the same as the untranslated point
-        x: pmark.x - (s1 / s0) * (pmark.x - t0.x),
-        y: pmark.y - (s1 / s0) * (pmark.y - t0.y)
+    let panStepFunc = (zoomLevel: number) => {
+      // this function gets called during every animation tick, to calculate where to move the model pan coordinates to (i.e. the translation) for that tick, where zoomLevel is calculated from the current zoomLevel + the target zoomLevel * the progress of the current animation
+
+      let targetScale = this.getCssScale(zoomLevel); // s1 - the scale to translate to for the current animation tick
+      let targetPoint: Point = {
+        // t1 - The target point to pan to.  It must stay the same as the untranslated point
+        x: destPoint.x - (targetScale / currentScale) * (destPoint.x - currentPan.x),
+        y: destPoint.y - (targetScale / currentScale) * (destPoint.y - currentPan.y)
       };
 
       return {
         // now return the difference between our initial click point and our translated (zoomed) click point
         // these are not absolute coordinates - just how far to move them
-        x: t1.x - t0.x,
-        y: t1.y - t0.y
+        x: targetPoint.x - currentPan.x,
+        y: targetPoint.y - currentPan.y
       };
     };
 
     // now rewind to the start of the anim and let it run its course
-    this.zoomAnimation = {
+    this.animationParams = {
       deltaZoomLevel: deltaZoomLevel, // the destination zoom level for this zoom operation (when the animation is completed)
-      translationFromZoom: translationFromZoom,
+      panStepFunc: panStepFunc,
       duration: this.config.zoomStepDuration, // how long the animation should take
       progress: this.config.disableZoomAnimation ? 1.0 : 0.0 // If zoom animation is disabled set progress to the finished point so that the animation completes on the first tick
     };

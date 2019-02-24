@@ -156,13 +156,21 @@ The panzoom library provides an API for interacting with, observing, and control
   
   * `getModelPosition(viewPosition: Point)` - The reverse operation of getViewPosition().
 
+  * `panToPoint(point: Point, [duration: number])` - Will animate the view so that the centre point of the view is at the *point* parameter coordinates, relative to the original, unzoomed content width and height.
+
+  * `panDelta(delta: Point, [duration: number])` - Will pan the view left, right, up, or down, based on a number of pixels relative to the original, unzoomed content.
+
+  * `panDeltaPercent(deltaPercent: Point, [duration: number])` - Will pan the view up, down, left, or right, based on a percentage of the original, unzoomed content width and height.
+  
+  * `panDeltaAbsolute(delta: Point, [duration: number])` - Will pan the view left, right, up, or down, based on a number of pixels.  This method doesn't adjust for scale.  I'm not sure why you'd want this, but it's provided just in case.
+
 
 ### PanZoom API Interfaces:
 ```typescript
 interface PanZoomModel {
   zoomLevel: number;
   isPanning?: boolean;
-  pan: Point; // the current centre point of the pan/zoom view
+  pan: Point; // how far the view has been moved on the x and y axes.  It is not adjusted for scale
 }
 
 interface Point {

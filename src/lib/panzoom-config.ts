@@ -26,7 +26,14 @@ export class PanZoomConfig {
   invertMouseWheel = false;
   zoomStepDuration = 0.2;
   zoomToFitZoomLevelFactor = 0.95;
-  modelChanged: Subject<PanZoomModel> = new Subject<PanZoomModel>();
+  modelChanged: BehaviorSubject<PanZoomModel> = new BehaviorSubject<PanZoomModel>({
+    isPanning: null,
+    zoomLevel: null,
+    pan: {
+      x: null,
+      y: null
+    }
+  });
   api: BehaviorSubject<PanZoomAPI> = new BehaviorSubject<PanZoomAPI>({
     model: null,
     config: null,
@@ -36,7 +43,11 @@ export class PanZoomConfig {
     zoomToFit: null,
     getViewPosition: null,
     getModelPosition: null,
-    resetView: null
+    resetView: null,
+    panToPoint: null,
+    panDelta: null,
+    panDeltaPercent: null,
+    panDeltaAbsolute: null
   });
   freeMouseWheel = false;
   freeMouseWheelFactor = 0.08;
