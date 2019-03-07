@@ -2,7 +2,6 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { Rect } from './panzoom-rect';
 import { PanZoomModel } from './panzoom-model';
 import { PanZoomAPI } from './panzoom-api';
-// declare var log;
 
 export class PanZoomConfig {
 
@@ -10,7 +9,6 @@ export class PanZoomConfig {
   neutralZoomLevel = 2;
   scalePerZoomLevel = 2.0;
   initialZoomLevel = this.neutralZoomLevel;
-  disableZoomAnimation = false;
   friction = 10.0;
   haltSpeed = 100.0;
   initialPanX = 0;
@@ -49,10 +47,10 @@ export class PanZoomConfig {
     panDeltaPercent: null,
     panDeltaAbsolute: null
   });
-  freeMouseWheel = false;
+  freeMouseWheel = true;
   freeMouseWheelFactor = 0.08;
-  useHardwareAcceleration = true;
-  chromeUseTransform = true;
+
+
 
   constructor() {
     if (this.keepInBounds && this.neutralZoomLevel !== 0) {

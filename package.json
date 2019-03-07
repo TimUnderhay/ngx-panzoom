@@ -10,10 +10,12 @@
   },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --prod",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "buildpack": "rm -rf dist/ && ng build --prod && cd dist/lib && npm pack .",
+    "buildpublish": "rm -rf dist/ && ng build --prod && cd dist/lib && npm publish .",
+    "builddemotest": "rm -rf dist/ && ng build --prod && cd dist/lib && npm pack . && cp ng2-panzoom-*.tgz ~/src/ng2-panzoom-demo && cd ~/src/ng2-panzoom-demo && npm install ng2-panzoom-2.0.0.tgz"
   },
   "private": true,
   "dependencies": {
@@ -25,7 +27,6 @@
     "core-js": "^2.5.4",
     "rxjs": "~6.2.0",
     "zone.js": "~0.8.26",
-    "ng2-mousewheel": "~0.9.5",
     "jquery": "^3.3.1"
   },
   "devDependencies": {

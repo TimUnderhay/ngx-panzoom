@@ -1,15 +1,33 @@
 # ng2-panzoom
 
-An Angular directive for panning and zooming an element or elements using the mouse and mousewheel.  Code is in place to support touchscreens, but it is completely untested.  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for writing it.
+An Angular directive for panning and zooming an element or elements using the mouse and mousewheel.  Provides basic support for touchscreens, though it can still do with improvement.  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen having written it, and for his blessing in this undertaking.
 
-It is built using Angular CLI 6 library support, so it may not work with Angular versions 2 through 5 (please excuse the 'ng2' moniker).
+It is built with Angular CLI 6.2.9 library support, so it may or may not work with Angular versions earlier than this, so please excuse the 'ng2' moniker.  To be honest, I only test the library with Angular 6.  Reports on compatibility with other Angular versions are welcome.
+
+This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  We even use a dash of jQuery.  But as this library doesn't fit the traditional Angular model as its purpose is only to alter a certain part of the DOM using CSS transforms, without adding, moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, I hope to maximise compatibility and performance.
 
 ## Demo
 Click [here](https://kensingtontech.github.io/ng2-panzoom-demo) for a demo of the module.  The demo source can be found [here](https://github.com/KensingtonTech/ng2-panzoom-demo).
 
 ## Features
-* Zoom using mouse wheel, double click, or API controls tied to your own UI.
-* Pan using click and drag. When releasing the mouse button whilst panning, the pan will come to a gradual stop.
+* Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
+* Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
+
+## Version 2.0 Changes
+
+Version 2.0 brings enhanced performance, makes adjustments for modern hardware and browsers, cleans up a lot of underlying code, and _may_ also bring backwards-compatibility for Angular 2 (no promises, though).
+
+* Version 2.0 has seen a fair number of under-the-bonnet (or hood) changes which should hopefully result in better panning and zooming performance.
+* Free wheel zooming is now the default experience and as such, `freeMouseWheel` now defaults to true.
+* The mouse wheel default direction has been inverted, so your `invertMouseWheel` setting may need to be flipped.
+* Several config options have been removed: `useHardwareAcceleration`, `chromeUseTransform`, and `disableZoomAnimation`.
+* The dependency on ng2-mousewheel has been removed.
+* Touch / mobile support - The library will now work with touch devices, though pinch-to-zoom still needs considerable work to make the experience what one would expect.  It wasn't worth delaying release to perfect this, though.  Future releases may see improvements.
+* It no longer requires Renderer2, so it may, at least _in theory_, work with Angular 2.  Please send reports either way.
+* It's 2019, so the library now assumes that all browsers and hardware have hardware acceleration.
+* Older browser-specifc CSS transforms have been removed in favour of newer standards-based transforms (i.e. '-webkit' and '-moz' prefixes and the like have been removed), which may cause breakage with older browsers.  If that's a problem, you should stick with version 1.x.
+
+
 
 ### Differences From the Original
 
@@ -18,13 +36,15 @@ Click [here](https://kensingtontech.github.io/ng2-panzoom-demo) for a demo of th
 * `zoomToFit()` animation - using the zoomToFit() function now will animate the view to the a desired rectangle.
 * A convenience method `resetView()` has been provided to animate the view back to its initial settings.
 * The `zoomIn()` and `zoomOut()` API functions now zoom to the last zoomed point rather than the centre point, unless no zoom point has been defined yet.
+* New API methods `panToPoint()`, `panDelta()`, `panDeltaPercent()`, and `panDeltaAbsolute()` have been added for panning the view.
+* Completely removed Renderer2 dependency in favour of native event listeners, so this _may_ work with Angular 2.  This was actually done to preserve passive event listener functionality from ng2-mousewheel, which Angular isn't able to do natively at the time of writing, at least with ease.
+* Many performance improvements.
 * The widget has not been migrated from the original project, though this probably shouldn't be hard to do.  Pull requests are welcome!
-* Performance improvements.
+* Touchscreen support works, but it is not great.  Work on this will continue.
 
 ### Dependencies
 * Angular
 * jQuery - Used for calculating positions of DOM elements (way easier than using Angular or JS methods).
-* ng2-mousewheel - for mouse wheel support.
 
 
 ## Installation
@@ -42,7 +62,6 @@ npm install ng2-panzoom --save
           "options": {
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/@kensingtontech/hamsterjs/hamster.js"
             ]
             ...
 ```
@@ -120,17 +139,14 @@ zoomToFitZoomLevelFactor            | number    | 0.95              | A number t
 zoomOnDoubleClick                   | boolean   | true              | Enable or disable zooming in on double click.
 zoomButtonIncrement                 | number    | 1.0               | The number of zoom levels to zoom on double click.
 zoomStepDuration                    | number    | 0.2               | Number of seconds to animate between two adjacent zoom levels.
-disableZoomAnimation                | boolean   | false             | Set to true to disable the animation while zooming. It will be more chunky but will consume less CPU resources.
 zoomOnMouseWheel                    | boolean   | true              | Enable or disable zoom in/out on mouse wheel.
 invertMouseWheel                    | boolean   | false             | Invert the behaviour of the mouse wheel (or two finger trackpad gesture).
-freeMouseWheel                      | boolean   | false             | By default, moving the mouse wheel will result in a change of _zoomButtonIncrement_.  By setting this to true, the mouse wheel will freely zoom the view without respect to discreet zoom levels.
+freeMouseWheel                      | boolean   | true              | By setting this to true, the mouse wheel will freely zoom the view without respect to discreet zoom levels.  With false, moving the mouse wheel will zoom the view by _zoomButtonIncrement_.
 freeMouseWheelFactor                | number    | 0.08              | How much to zoom the view with every tick of the wheel, if using freeMouseWheel.
 friction                            | number    | 10.0              | Constant which controls the friction when dragging and then letting go. The higher the number, the more quickly the animation will come to a stop.
 haltSpeed                           | number    | 100.0             | Constant which controls when the pan animation has slowed down enough to be terminated. The lower the number, the longer it will take to come to a stop.
 panOnClickDrag                      | boolean   | true              | Enable or disable pan on clicking and dragging the mouse.
-modelChanged                        | Subject&lt;PanZoomModel>   | Not Applicable         | An RXJS observable which can be subscribed to in order to observe changes to the panzoom view. The model will be passed to the callback function.
-useHardwareAcceleration             | boolean   | true              | Use translate3d for panning instead of using standard CSS styles 'left' and 'top'. This is intended to trigger hardware acceleration and may increase the speed greatly.
-chromeUseTransform                  | boolean   | true              | Cause Chrome to use CSS transform instead of CSS zoom. Enable if you use nested SVG and see performance problems in Chrome.
+modelChanged                        | BehaviorSubject&lt;PanZoomModel>      | Not Applicable         | An RXJS observable which can be subscribed to in order to observe changes to the panzoom view. The model will be passed to the callback function.
 keepInBounds                        | boolean   | false             | When true, it will not be possible to pan the contents off the screen -- it will snap back when trying to do so.  It will not be possible to zoom further out than the neutral zoom level.  *REMEMBER* that the initial zoom level must either be less than or equal to the neutral zoom level, or weird things will happen.
 keepInBoundsRestoreForce            | number    | 0.5               | Constant to control how quickly the contents snap back into place after attempting to pan out of bounds.
 keepInBoundsDragPullback            | number    | 0.7               | Constant to control the perceived force preventing dragging the contents out of bounds.
@@ -252,7 +268,5 @@ export class MyComponent implements OnInit, OnDestroy {
 Pull requests are welcome.
 
 ## Reference
-
-[ng2-mousewheel project](https://github.com/KensingtonTech/ng2-mousewheel)
 
 [The original angular-pan-zoom project on GitHub](https://github.com/mvindahl/angular-pan-zoom)
