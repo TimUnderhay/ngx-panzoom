@@ -1,6 +1,6 @@
 # ng2-panzoom
 
-An Angular directive for panning and zooming an element or elements using the mouse and mousewheel.  Provides basic support for touchscreens, though it can still do with improvement.  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen having written it, and for his blessing in this undertaking.
+An Angular directive for panning and zooming an element or elements using the mouse and mousewheel.  Provides basic support for touchscreens, though it can still do with improvement.  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing in this undertaking.
 
 It is built with Angular CLI 6.2.9 library support, so it may or may not work with Angular versions earlier than this, so please excuse the 'ng2' moniker.  To be honest, I only test the library with Angular 6.  Reports on compatibility with other Angular versions are welcome.
 
@@ -12,6 +12,13 @@ Click [here](https://kensingtontech.github.io/ng2-panzoom-demo) for a demo of th
 ## Features
 * Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 * Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
+
+## Version 2.1.0 Changes
+
+Version 2.1.0 is a minor release with a couple of small changes:
+
+* Configuration options can now be passed to the PanZoomConfig constructor, rather than only being settable after initialisation.
+* Pan mouse button is now configurable via config parameter `dragMouseButton`, with values `left`, `middle`, and `right`.
 
 ## Version 2.0 Changes
 
@@ -150,6 +157,7 @@ modelChanged                        | BehaviorSubject&lt;PanZoomModel>      | No
 keepInBounds                        | boolean   | false             | When true, it will not be possible to pan the contents off the screen -- it will snap back when trying to do so.  It will not be possible to zoom further out than the neutral zoom level.  *REMEMBER* that the initial zoom level must either be less than or equal to the neutral zoom level, or weird things will happen.
 keepInBoundsRestoreForce            | number    | 0.5               | Constant to control how quickly the contents snap back into place after attempting to pan out of bounds.
 keepInBoundsDragPullback            | number    | 0.7               | Constant to control the perceived force preventing dragging the contents out of bounds.
+dragMouseButton                     | string    | 'left'            | Controls which mouse button drags the view.  Valid options are `left`, `middle`, and `right`.  *NOTE:* Using `middle` and `right` will disable the default 'auxclick' and 'contextmenu' handlers, respectively.  *ALSO NOTE:* Chrome seems to have a bug that doesn't the permit the 'mousemove' event to fire after middle-click drag until it receives a normal left 'click' event.  If anyone can shed any light on this, I'd be happy to hear from you.  It's such an edge case, though, that I won't be opening a bug report, but feel free to do so if this affects you. 
 
 ## API
 The panzoom library provides an API for interacting with, observing, and controlling it.  The following methods and objects are available from the PanZoomAPI:

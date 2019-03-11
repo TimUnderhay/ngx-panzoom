@@ -15,7 +15,7 @@
     "e2e": "ng e2e",
     "buildpack": "rm -rf dist/ && ng build --prod && cd dist/lib && npm pack .",
     "buildpublish": "rm -rf dist/ && ng build --prod && cd dist/lib && npm publish .",
-    "builddemotest": "rm -rf dist/ && ng build --prod && cd dist/lib && npm pack . && cp ng2-panzoom-*.tgz ~/src/ng2-panzoom-demo && cd ~/src/ng2-panzoom-demo && npm install ng2-panzoom-2.0.0.tgz"
+    "builddemotest": "rm -rf dist/ && ng build --prod && cd dist/lib && npm pack . && cp ng2-panzoom-*.tgz ~/src/ng2-panzoom-demo && cd ~/src/ng2-panzoom-demo && npm install ng2-panzoom-2.1.0.tgz"
   },
   "private": true,
   "dependencies": {
