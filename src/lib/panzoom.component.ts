@@ -259,10 +259,32 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
+/**
+ * Method will check if 'child' node element is a child of 
+ * parent node with class 'className'
+ * @param className
+ * @param child
+ */  
+private isPareentElement(className, child) {
+  let node = child.parentNode;
+  while(node != null) {
+    if(node.classList && node.classList.contains(className)) {
+      return true;
+    }
+    node = node.parentNode;
+  }
+  return false;
+}
 
   private onMousedown = (event: any) => {
     // console.log('PanZoomComponent: onMousedown()', event);
+    
+    /* Check if clicked location is inside element from which
+       dragging is prevented. */
+    if (this.config.noDragFromElementClass 
+        && this.isPareentElement(this.config.noDragFromElementClass, event.srcElement)) {
+      return;
+    }
 
     event.preventDefault();
     event.stopPropagation();

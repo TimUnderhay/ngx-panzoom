@@ -49,6 +49,7 @@ export class PanZoomConfig {
   });
   freeMouseWheel = true;
   freeMouseWheelFactor = 0.08;
+  noDragFromElementClass: string;
 
 
 
