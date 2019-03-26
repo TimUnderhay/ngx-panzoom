@@ -776,6 +776,21 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   private freeZoom(clickPoint: Point, wheelDelta: number): void {
     // console.log('PanZoomComponent: freeZoom(): this.base:', this.base);
 
+    if (this.isDragging) {
+      // don't allow zooming if the mouse is down
+      return;
+    }
+
+    // now handle interruption of an in-progress animation
+    if (this.animationParams) {
+      this.animationParams = null; // cancel an existing animation
+    }
+
+    if (this.panVelocity) {
+      this.dragFinishing = false;
+      this.panVelocity = null;
+    }
+
     let currentPan: Point = {
       // the current base coordinates
       x: this.base.pan.x,
