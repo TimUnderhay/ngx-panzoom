@@ -27,6 +27,7 @@ export class PanZoomConfig {
   zoomToFitZoomLevelFactor = 0.95;
   freeMouseWheel = true;
   freeMouseWheelFactor = 0.08;
+ noDragFromElementClass: string;
   modelChanged: BehaviorSubject<PanZoomModel> = new BehaviorSubject<PanZoomModel>({
     isPanning: null,
     zoomLevel: null,
@@ -49,12 +50,9 @@ export class PanZoomConfig {
     panDelta: null,
     panDeltaPercent: null,
     panDeltaAbsolute: null
-  });
-
-
-
-  constructor(options = null) {
-    if (!options) {
+    
+  constructor() {
+  if (!options) {
       return;
     }
     if ('zoomLevels' in options) {
