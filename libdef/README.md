@@ -2,7 +2,7 @@
 
 An Angular directive for panning and zooming an element or elements using the mouse and mousewheel.  Provides basic support for touchscreens, though it can still do with improvement.  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing in this undertaking.
 
-It is built with Angular CLI 6.2.9 library support, so it may or may not work with Angular versions earlier than this, so please excuse the 'ng2' moniker.  To be honest, I only test the library with Angular 6.  Reports on compatibility with other Angular versions are welcome.
+It is built with Angular CLI 8 library support, so please excuse the 'ng2' moniker.  This version has been confirmed to work with Angular versions 6.1 and 8, and should also be compatible with earlier Angular versions.  As such, the peer depencies permit installation all the way back to Angular 2.  Reports on compatibility with other Angular versions are welcome.
 
 This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  We even use a dash of jQuery.  But as this library doesn't fit the traditional Angular model as its purpose is only to alter a certain part of the DOM using CSS transforms, without adding, moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, I hope to maximise compatibility and performance.
 
@@ -12,6 +12,14 @@ Click [here](https://kensingtontech.github.io/ng2-panzoom-demo) for a demo of th
 ## Features
 * Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 * Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
+
+## Version 2.2.0 Changes
+
+Version 2.2.0 contains two changes:
+
+* The library has been updated for Angular 8.
+* Addition of configuration parameter `noDragFromElementClass`.
+* Permit all Angular versions in peer dependencies.  This is not a guarantee they will all work, though.
 
 ## Version 2.1.0 Changes
 
@@ -141,7 +149,7 @@ scalePerZoomLevel                   | number    | 2.0               | The differ
 initialZoomLevel                    | number    | neutralZoomLevel  | The initially selected zoom level.
 initialPanX                         | number    | 0                 | The initial pan in the horizontal direction.
 initialPanY                         | number    | 0                 | The initial pan in the vertical direction.
-initialZoomToFit                    | rectangle | undefined         | When defined, will initially zoom to fit the given rectangle (see API for explanation of zoom to fit). This overrides the initialZoomLevel, initialPanX, and initialPanY values.
+initialZoomToFit                    | rectangle | null              | When defined, will initially zoom to fit the given rectangle (see API for explanation of zoom to fit). This overrides the initialZoomLevel, initialPanX, and initialPanY values.
 zoomToFitZoomLevelFactor            | number    | 0.95              | A number to indicate how closely zoom to fit will work. 1.0 is a perfect fit.  Lowering the number will reveal a bit of the surrounding contents.
 zoomOnDoubleClick                   | boolean   | true              | Enable or disable zooming in on double click.
 zoomButtonIncrement                 | number    | 1.0               | The number of zoom levels to zoom on double click.
@@ -158,6 +166,7 @@ keepInBounds                        | boolean   | false             | When true,
 keepInBoundsRestoreForce            | number    | 0.5               | Constant to control how quickly the contents snap back into place after attempting to pan out of bounds.
 keepInBoundsDragPullback            | number    | 0.7               | Constant to control the perceived force preventing dragging the contents out of bounds.
 dragMouseButton                     | string    | 'left'            | Controls which mouse button drags the view.  Valid options are `left`, `middle`, and `right`.  *NOTE:* Using `middle` and `right` will disable the default 'auxclick' and 'contextmenu' handlers, respectively.  *ALSO NOTE:* Chrome seems to have a bug that doesn't the permit the 'mousemove' event to fire after middle-click drag until it receives a normal left 'click' event.  If anyone can shed any light on this, I'd be happy to hear from you.  It's such an edge case, though, that I won't be opening a bug report, but feel free to do so if this affects you. 
+noDragFromElementClass              | string    | null              | If set, this will prevent click-drag on elements who have a parent element containing a specific class name.
 
 ## API
 The panzoom library provides an API for interacting with, observing, and controlling it.  The following methods and objects are available from the PanZoomAPI:

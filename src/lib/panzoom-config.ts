@@ -13,7 +13,7 @@ export class PanZoomConfig {
   haltSpeed = 100.0;
   initialPanX = 0;
   initialPanY = 0;
-  initialZoomToFit: Rect;
+  initialZoomToFit: Rect = null;
   keepInBounds = false;
   keepInBoundsDragPullback = 0.7;
   keepInBoundsRestoreForce = 0.5;
@@ -27,7 +27,7 @@ export class PanZoomConfig {
   zoomToFitZoomLevelFactor = 0.95;
   freeMouseWheel = true;
   freeMouseWheelFactor = 0.08;
- noDragFromElementClass: string;
+  noDragFromElementClass: string = null;
   modelChanged: BehaviorSubject<PanZoomModel> = new BehaviorSubject<PanZoomModel>({
     isPanning: null,
     zoomLevel: null,
@@ -50,9 +50,12 @@ export class PanZoomConfig {
     panDelta: null,
     panDeltaPercent: null,
     panDeltaAbsolute: null
-    
-  constructor() {
-  if (!options) {
+  });
+
+
+
+  constructor(options = null) {
+    if (!options) {
       return;
     }
     if ('zoomLevels' in options) {
@@ -123,6 +126,9 @@ export class PanZoomConfig {
     }
     if (this.keepInBounds && this.neutralZoomLevel !== 0) {
       console.warn('You have set keepInBounds to true and neutralZoomLevel to ' + this.neutralZoomLevel + '. Be aware that the zoom level cannot go below ' + this.neutralZoomLevel);
+    }
+    if ('noDragFromElementClass' in options) {
+      this.noDragFromElementClass = options.noDragFromElementClass;
     }
 
   }
