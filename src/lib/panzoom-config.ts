@@ -51,6 +51,7 @@ export class PanZoomConfig {
     panDeltaPercent: null,
     panDeltaAbsolute: null
   });
+  acceleratePan: true;
 
 
 
@@ -130,6 +131,8 @@ export class PanZoomConfig {
     if ('noDragFromElementClass' in options) {
       this.noDragFromElementClass = options.noDragFromElementClass;
     }
-
+    if ('acceleratePan' in options) {
+      this.acceleratePan = options.acceleratePan;
+    }
   }
 }

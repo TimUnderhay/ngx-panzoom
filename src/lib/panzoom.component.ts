@@ -4,19 +4,9 @@ import { Point } from './panzoom-point';
 import { PanZoomModel } from './panzoom-model';
 import { PanZoomAPI } from './panzoom-api';
 import { Rect } from './panzoom-rect';
-declare var $: any;
+import $ from 'jquery';
 
-/*
-var oldAddEventListener = EventTarget.prototype.addEventListener;
 
-EventTarget.prototype.addEventListener = function(eventName, eventHandler: any, options: any = null)
-{
-  console.log('eventName:', eventName);
-  oldAddEventListener.call(this, eventName, function(event) {
-    eventHandler(event);
-  }, options);
-};
-*/
 
 interface ZoomAnimation {
   deltaZoomLevel: number;
@@ -25,11 +15,15 @@ interface ZoomAnimation {
   progress: number;
 }
 
+
+
 interface Position {
   x?: number;
   y?: number;
   length?: number;
 }
+
+
 
 @Component( {
   // tslint:disable-next-line:component-selector
@@ -46,6 +40,8 @@ interface Position {
 <div #panzoomOverlay style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0; display: none; pointer-events: none;"></div>
   `
 } )
+
+
 
 export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -81,7 +77,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   private scale: number;
   private isFirstSync = true;
   private lastClickPoint: Point;
-  private acceleratedFrameRef: any;
+  private acceleratedFrameRef: ElementRef;
   private zoomLevelIsChanging = false;
   private dragFinishing = false;
   private dragMouseButton: number = null;
@@ -155,10 +151,18 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // console.log('frameHeight:', this.frameHeight);
     // console.log('frameWidth:', this.frameWidth);
 
-    (<any>this.acceleratedFrameRef.nativeElement.style).willChange = 'transform';
+    this.acceleratedFrameRef.nativeElement.style.willChange = 'transform';
     if (navigator.userAgent.search('Chrome') >= 0) {
       this.isChrome = true;
       this.acceleratedFrameRef.nativeElement.style.transform = 'translateZ(0)';
+    }
+
+    if (this.config.acceleratePan) {
+      this.panElementRef.nativeElement.style.willChange = 'transform';
+      if (navigator.userAgent.search('Chrome') >= 0) {
+        this.isChrome = true;
+        this.panElementRef.nativeElement.style.transform = 'translateZ(0)';
+      }
     }
 
     this.animationTick(performance.now());
