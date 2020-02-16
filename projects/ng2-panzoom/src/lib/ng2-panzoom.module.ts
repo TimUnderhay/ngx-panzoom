@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { PanZoomComponent } from './panzoom.component';
-import * as JQuery from 'jquery';
 
 @NgModule({
   imports: [],
