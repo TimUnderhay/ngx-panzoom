@@ -43,7 +43,7 @@
     "codelyzer": "^5.1.2",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "karma": "~3.0.0",
     "karma-chrome-launcher": "~2.2.0",
     "karma-coverage-istanbul-reporter": "~2.0.1",
