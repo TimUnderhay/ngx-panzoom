@@ -13,7 +13,7 @@ export class PanZoomConfig {
   haltSpeed = 100.0;
   initialPanX = 0;
   initialPanY = 0;
-  initialZoomToFit: Rect = null;
+  initialZoomToFit: Rect;
   keepInBounds = false;
   keepInBoundsDragPullback = 0.7;
   keepInBoundsRestoreForce = 0.5;
@@ -27,7 +27,7 @@ export class PanZoomConfig {
   zoomToFitZoomLevelFactor = 0.95;
   freeMouseWheel = true;
   freeMouseWheelFactor = 0.08;
-  noDragFromElementClass: string = null;
+  noDragFromElementClass: string;
   modelChanged: BehaviorSubject<PanZoomModel> = new BehaviorSubject<PanZoomModel>({
     isPanning: null,
     zoomLevel: null,
@@ -55,8 +55,8 @@ export class PanZoomConfig {
 
 
 
-  constructor(options = null) {
-    if (!options) {
+  constructor(options?) {
+    if (options === undefined) {
       return;
     }
     if ('zoomLevels' in options) {

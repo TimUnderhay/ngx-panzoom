@@ -10,7 +10,7 @@ This library deliberately parts with certain received Angular wisdom of using on
 
 I am actively soliciting pull requests for mobile support.  Read on.
 
-The library implements some basic support that may work with some mobile devices, though pinch-to-zoom still needs considerable work.  As the application that this library was developed for was never intended for use with mobile devices, there are no plans to implement full mobile suppor.  As long as this remains the case, I respecfully ask for no more issues concerning mobile support, please.  I realise that this will limit adoption, but for an enterprising developer out there, I can't imagine that adding mobile support would be nearly as big of a challenge as it was to port the library to Angular from AngularJS!
+The library implements some basic support that may work with some mobile devices, though pinch-to-zoom still needs considerable work.  As the application that this library was developed for was never intended for use with mobile devices, there are no plans to implement full mobile support.  As long as this remains the case, I respecfully ask for no more issues concerning mobile support, please.  I realise that this will limit adoption, but for an enterprising developer out there, I can't imagine that adding mobile support would be nearly as big of a challenge as it was to port the library to Angular from AngularJS!
 
 ## Demo
 
@@ -21,50 +21,12 @@ Click [here](https://kensingtontech.github.io/ng2-panzoom-demo) for a demo of th
 * Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 * Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
 
-## Version 9.0.0 Changes
+### Version 9 Changes
 
-Version 9.0.0 is compiled using Angular 9.0.1.  Per the Angular guidance at the time of writing (`https://angular.io/guide/creating-libraries`), Ivy is not used for the NPM repo build.  The following changes have been made:
+Version 9.x is compiled using Angular 9.x.  Per the Angular guidance at the time of writing (`https://angular.io/guide/creating-libraries`), Ivy is not used for the NPM repo build.  The following changes have been made:
 
 * The project structure has been changed to match new Angular CLI library projects.
 * Updated the remaining project definitions to match new CLI library projects.
-
-## Version 8.0.0 Changes
-
-Version 8.0.0 introduces a new versioning scheme to match Angular releases.  Version 8 of the library is compiled for version 8.x of Angular.  9.0.0 will be for 9.x, and so on.
-
-* jQuery is now a peer dependency rather than a dependency -- be sure it's installed in your project with `npm install --save jquery`.
-* You can probably also remove jQuery from 'scripts' in your project's angular.json, as long as it's installed in package.json, and if you're importing it properly in your project (that is if you use jQuery at all).  This is because a typescript import is now used, as opposed to accessing the global '$' object.
-* Hardware acceleration is now enabled on the pan frame, in addition to the zoom frame.  This could potentially have unintended consequences for some users, so it is configurable with the `acceleratePan` option.
-* Added config option `acceleratePan` to control pan acceleration (defaults to true).
-
-## Version 2.2.0 Changes
-
-Version 2.2.0 contains two changes:
-
-* The library has been updated for Angular 8.
-* Addition of configuration parameter `noDragFromElementClass`.
-* Permit all Angular versions in peer dependencies.  This is not a guarantee they will all work, though.
-
-## Version 2.1.0 Changes
-
-Version 2.1.0 is a minor release with a couple of small changes:
-
-* Configuration options can now be passed to the PanZoomConfig constructor, rather than only being settable after initialisation.
-* Pan mouse button is now configurable via config parameter `dragMouseButton`, with values `left`, `middle`, and `right`.
-
-## Version 2.0 Changes
-
-Version 2.0 brings enhanced performance, makes adjustments for modern hardware and browsers, cleans up a lot of underlying code, and _may_ also bring backwards-compatibility for Angular 2 (no promises, though).
-
-* Version 2.0 has seen a fair number of under-the-bonnet (or hood) changes which should hopefully result in better panning and zooming performance.
-* Free wheel zooming is now the default experience and as such, `freeMouseWheel` now defaults to true.
-* The mouse wheel default direction has been inverted, so your `invertMouseWheel` setting may need to be flipped.
-* Several config options have been removed: `useHardwareAcceleration`, `chromeUseTransform`, and `disableZoomAnimation`.
-* The dependency on ng2-mousewheel has been removed.
-* It no longer requires Renderer2, so it may, at least _in theory_, work with Angular 2.  Please send reports either way.
-* It's 2019, so the library now assumes that all browsers and hardware have hardware acceleration.
-* Older browser-specifc CSS transforms have been removed in favour of newer standards-based transforms (i.e. '-webkit' and '-moz' prefixes and the like have been removed), which may cause breakage with older browsers.  If that's a problem, you should stick with version 1.x.
-
 
 ### Differences From the Original
 
