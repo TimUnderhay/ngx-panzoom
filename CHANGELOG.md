@@ -1,5 +1,25 @@
 # Change Log
 
+## 10.0.0
+
+### Changed
+- Updated for Angular 10.x.
+- Renamed class `panElement` to `pan-element`.
+- Renamed class `zoomElement` to `zoom-element`.
+- Renamed class `panzoomOverlay` to `pan-zoom-overlay`.
+
+### Added
+- New API helper method `centerContent()`
+- New API helper method `centerTopLeft()`
+- New API helper method `centerBottomLeft()`
+- New API helper method `centerTopRight()`
+- New API helper method `centerBottomRight()`
+- New API helper method `centerX()`
+- New API helper method `centerY()`
+
+### Removed
+- jQuery is no longer a dependency.
+
 ## 9.0.1
 
 ### Changed

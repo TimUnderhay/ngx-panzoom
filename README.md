@@ -4,13 +4,7 @@ An Angular component for panning and zooming an element or elements using the mo
 
 It is built using Angular CLI 9.x, so it may or may not work with Angular versions earlier than this.  Please excuse the 'ng2' moniker -- I could switch to 'ngx', but I honestly can't be bothered.  It is only tested with the corresponding version of Angular.
 
-This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  We even use a dash of jQuery.  But as this library doesn't fit the traditional Angular model, as its purpose is only to alter a certain part of the DOM using CSS transforms, without adding, moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
-
-## Mobile Support -- Please Send PR's
-
-I am actively soliciting pull requests for mobile support.  Read on.
-
-The library implements some basic support that may work with some mobile devices, though pinch-to-zoom still needs considerable work.  As the application that this library was developed for was never intended for use with mobile devices, there are no plans to implement full mobile support.  As long as this remains the case, I respecfully ask for no more issues concerning mobile support, please.  I realise that this will limit adoption, but for an enterprising developer out there, I can't imagine that adding mobile support would be nearly as big of a challenge as it was to port the library to Angular from AngularJS!
+This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to alter a certain part of the DOM using CSS transforms, without adding, moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
 
 ## Demo
 
@@ -18,40 +12,54 @@ Click [here](https://kensingtontech.github.io/ng2-panzoom-demo) for a demo of th
 
 ## Features
 
-* Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
-* Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
+- Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
+- Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
 
-### Version 9 Changes
+# Version 10 Changes
 
-Version 9.x is compiled using Angular 9.x.  Per the Angular guidance at the time of writing (`https://angular.io/guide/creating-libraries`), Ivy is not used for the NPM repo build.  The following changes have been made:
+Version 10.x is compiled using Angular 10.x.  Per the Angular guidance at the time of writing (`https://angular.io/guide/creating-libraries`), Ivy is not used for the NPM repo build.  The following changes have been made:
 
-* The project structure has been changed to match new Angular CLI library projects.
-* Updated the remaining project definitions to match new CLI library projects.
+- The jQuery dependency has finally been removed!
+- Updated for and compiled with Angular 10.x.
+- New API helper methods `centerContent()`, `centerTopLeft()`, `centerBottomLeft()`, `centerTopRight()`, `centerBottomRight()`, `centerX()`, and `centerY()`
 
-### Differences From the Original
+## Version 10 Potentially Breaking Changes
 
-* The pan-zoom service has been eliminated.
-* **Free zoom** - zooming is no longer limited to switching between two distinct zoom levels.  Zoom can now be smoothly and freely controlled using the mouse wheel or trackpad.
-* `zoomToFit()` animation - using the zoomToFit() function now will animate the view to the a desired rectangle.
-* A convenience method `resetView()` has been provided to animate the view back to its initial settings.
-* The `zoomIn()` and `zoomOut()` API functions now zoom to the last zoomed point rather than the centre point, unless no zoom point has been defined yet.
-* New API methods `panToPoint()`, `panDelta()`, `panDeltaPercent()`, and `panDeltaAbsolute()` have been added for panning the view.
-* Many performance improvements.
-* The widget has not been migrated from the original project, though this probably shouldn't be hard to do.  Pull requests are welcome!
-* Touchscreen support works, but it is not great.  Work on this will continue.
+- Renamed class panElement to pan-element.
+- Renamed class zoomElement to zoom-element.
+- Renamed class panzoomOverlay to pan-zoom-overlay.
 
-### Dependencies
-* Angular
-* jQuery - Used for calculating positions of DOM elements (way easier than using Angular or native JS methods).
+# Differences From the Original
+
+- The pan-zoom service has been eliminated.
+- **Free zoom** - zooming is no longer limited to switching between two distinct zoom levels.  Zoom can now be smoothly and freely controlled using the mouse wheel or trackpad.
+- `zoomToFit()` animation - using the zoomToFit() function now will animate the view to the a desired rectangle.
+- A convenience method `resetView()` has been provided to animate the view back to its initial settings.
+- The `zoomIn()` and `zoomOut()` API functions now zoom to the last zoomed point rather than the centre point, unless no zoom point has been defined yet.
+- New API methods `panToPoint()`, `panDelta()`, `panDeltaPercent()`, and `panDeltaAbsolute()` have been added for panning the view.
+- Many performance improvements.
+- The widget has not been migrated from the original project, though this probably shouldn't be hard to do.  Pull requests are welcome!
+- Touchscreen support works, but it is not great.  Work on this will continue.
+
+## Dependencies
+- Angular
+
+## Mobile Support -- Actively Soliciting PR's
+
+I am actively soliciting pull requests for mobile support.  Read on.
+
+The library implements some basic support that may work with some mobile devices, though pinch-to-zoom still needs considerable work.  As the application that this library was developed for was never intended for use with mobile devices, there are no plans to implement full mobile support.  As long as this remains the case, I respecfully ask for no more issues concerning mobile support, please.  I realise that this will limit adoption, but for an enterprising developer out there, I can't imagine that adding mobile support would be nearly as big of a challenge as it was to port the library to Angular from AngularJS!
 
 
 ## Installation
 
 ```
-npm install ng2-panzoom jquery --save
+npm install ng2-panzoom --save
 ```
 
+
 ### app.module.ts:
+
 ```typescript
 import { Ng2PanZoomModule } from 'ng2-panzoom';
 
@@ -83,12 +91,19 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 @Component({
   selector: 'my-component'
   template: `
+
     <div style="position: absolute; top: 100px; bottom: 0; left: 0; right: 0;">
+
       <pan-zoom [config]="panzoomConfig">
+
         <div style="position: relative;">
+
           <img src="/myimage1.jpg">
+
         </div>
+
       </pan-zoom>
+
     </div>
   `
 })
@@ -142,34 +157,49 @@ acceleratePan                       | boolean   | true              | Controls w
 ## API
 The panzoom library provides an API for interacting with, observing, and controlling it.  The following methods and objects are available from the PanZoomAPI:
 
-  * `model: PanZoomModel`  - The current panzoom model - see the _PanZoomModel_ Interface below.
+  - `model: PanZoomModel`  - The current panzoom model - see the _PanZoomModel_ Interface below.
 
-  * `config: PanZoomConfig` - The current panzooom configuration.
+  - `config: PanZoomConfig` - The current panzooom configuration.
 
-  * `changeZoomLevel(newZoomLevel: number, clickPoint: Point)` - This method will reset the view to _newZoomLevel_, with _clickPoint_ as its centre point.
+  - `changeZoomLevel(newZoomLevel: number, clickPoint: Point)` - This method will reset the view to _newZoomLevel_, with _clickPoint_ as its centre point.
 
-  * `zoomIn()` - This will zoom the view in to the last zoomed point by one zoom level.
+  - `zoomIn()` - This will zoom the view in to the last zoomed point by one zoom level.
 
-  * `zoomOut()` - This will zoom the view out from the last zoomed point by one zoom level.
+  - `zoomOut()` - This will zoom the view out from the last zoomed point by one zoom level.
 
-  * `zoomToFit(rectangle: Rect, [duration: number])` - Animates the view to focus on a rectangle of the underlying canvas.  **duration** is how long the animation should take (in seconds), and is optional.  **rectangle** is two coordinates on the canvas which the panZoom view is pan/zooming.  See the below section on PanZoom Interfaces for its definition.
+  - `zoomToFit(rectangle: Rect, [duration: number])` - Animates the view to focus on a rectangle of the underlying canvas.  **duration** is how long the animation should take (in seconds), and is optional.  **rectangle** is two coordinates on the canvas which the panZoom view is pan/zooming.  See the below section on PanZoom Interfaces for its definition.
  
-  * `resetView()` - A shortcut method to reset the pan and zoom back to the initial view.
+  - `resetView()` - A shortcut method to reset the pan and zoom back to the initial view.
   
-  * `getViewPosition(modelPosition: Point)` - By passing in x,y coordinates of the original, untransformed content canvas, it will return the current pixel position of this point.
+  - `getViewPosition(modelPosition: Point)` - By passing in x,y coordinates of the original, untransformed content canvas, it will return the current pixel position of this point.
   
-  * `getModelPosition(viewPosition: Point)` - The reverse operation of getViewPosition().
+  - `getModelPosition(viewPosition: Point)` - The reverse operation of getViewPosition().
 
-  * `panToPoint(point: Point, [duration: number])` - Will animate the view so that the centre point of the view is at the *point* parameter coordinates, relative to the original, unzoomed content width and height.
+  - `panToPoint(point: Point, [duration: number])` - Will animate the view so that the centre point of the view is at the *point* parameter coordinates, relative to the original, unzoomed content width and height.
 
-  * `panDelta(delta: Point, [duration: number])` - Will pan the view left, right, up, or down, based on a number of pixels relative to the original, unzoomed content.
+  - `panDelta(delta: Point, [duration: number])` - Will pan the view left, right, up, or down, based on a number of pixels relative to the original, unzoomed content.
 
-  * `panDeltaPercent(deltaPercent: Point, [duration: number])` - Will pan the view up, down, left, or right, based on a percentage of the original, unzoomed content width and height.
+  - `panDeltaPercent(deltaPercent: Point, [duration: number])` - Will pan the view up, down, left, or right, based on a percentage of the original, unzoomed content width and height.
   
-  * `panDeltaAbsolute(delta: Point, [duration: number])` - Will pan the view left, right, up, or down, based on a number of pixels.  This method doesn't adjust for scale.  I'm not sure why you'd want this, but it's provided just in case.
+  - `panDeltaAbsolute(delta: Point, [duration: number])` - Will pan the view left, right, up, or down, based on a number of pixels.  This method doesn't adjust for scale.  I'm not sure why you'd want this, but it's provided just in case.
+
+  - `centerContent([duration: number])` - Will centre the the content vertically and horizontally at the current scale.
+
+  - `centerTopLeft([duration: number])` - Will centre the top-left corner of the content at the current scale.
+
+  - `centerBottomLeft([duration: number])` - Will centre the bottom-left corner of the content at the current scale.
+
+  - `centerTopRight([duration: number])` - Will centre the top-right corner of the content at the current scale.
+
+  - `centerBottomRight([duration: number])` - Will centre the bottom-right corner of the content at the current scale.
+
+  - `centerX([duration: number])` - Will centre the view on its X axis.
+
+  - `centerY([duration: number])` - Will centre the view on its Y axis.
 
 
-### PanZoom API Interfaces:
+## PanZoom API Interfaces:
+
 ```typescript
 interface PanZoomModel {
   zoomLevel: number;
@@ -190,8 +220,9 @@ interface Rect {
 }
 ```
 
-### Getting at the API
-The panzoom API is exposed through an RXJS observable as a property of the `PanZoomConfig` class, named `api`, to which you simply subscribe to obtain the API object.  The subscription callback method will be passed the API as its only parameter, of type `PanZoomAPI`.  Because it uses a BehaviorSubject, the callback will immediately trigger when subscribed to, assuming panzoom has already been initialised.  If panzoom hasn't yet been initialised, the subscription callback will fire as soon as initialisation occurs.
+## Getting at the API
+
+The panzoom API is exposed through an RxJS observable as a property of the `PanZoomConfig` class, named `api`, to which you simply subscribe to obtain the API object.  The subscription callback method will be passed the API as its only parameter, of type `PanZoomAPI`.  Because it uses a BehaviorSubject, the callback will immediately trigger when subscribed to, assuming panzoom has already been initialised.  If panzoom hasn't yet been initialised, the subscription callback will fire as soon as initialisation occurs.
 
 ```typescript
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
@@ -217,6 +248,7 @@ export class MyComponent implements OnInit, OnDestroy {
 ```
 
 Now that we have our API stored in `this.panZoomAPI`, we can access it thusly:
+
 ```typescript
 this.panZoomAPI.zoomIn();
 this.panZoomAPI.zoomOut();
@@ -224,9 +256,11 @@ this.panZoomAPI.zoomOut();
 
 
 ## 'Events'
+
 The PanZoomConfig class has an RXJS observable (`modelChanged`) which can be used to monitor the pan/zoom state from another component.  The observable emits type `PanZoomModel` (see above section on API Interfaces).  For instance, when the zoom level reaches a certain level, you may want to display a custom control or content on your page.  Another use may be to do something when the panzoom centre point is over a certain part of the view.
 
 ### Example modelChanged Subscription
+
 ```typescript
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 
@@ -252,9 +286,10 @@ export class MyComponent implements OnInit, OnDestroy {
 }
 ```
 
-# Contributing
+## Contributing
+
 Pull requests are welcome.
 
 ## Reference
 
-[The original angular-pan-zoom project on GitHub](https://github.com/mvindahl/angular-pan-zoom)
+[Martin Vindahl Olsen's original angular-pan-zoom project on GitHub](https://github.com/mvindahl/angular-pan-zoom)

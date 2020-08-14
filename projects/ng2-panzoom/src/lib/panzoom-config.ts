@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { Rect } from './panzoom-rect';
+import { Rect } from './types/rect';
 import { PanZoomModel } from './panzoom-model';
 import { PanZoomAPI } from './panzoom-api';
 
@@ -49,7 +49,14 @@ export class PanZoomConfig {
     panToPoint: null,
     panDelta: null,
     panDeltaPercent: null,
-    panDeltaAbsolute: null
+    panDeltaAbsolute: null,
+    centerContent: null,
+    centerX: null,
+    centerY: null,
+    centerTopLeft: null,
+    centerTopRight: null,
+    centerBottomLeft: null,
+    centerBottomRight: null
   });
   acceleratePan: true;
 

@@ -1,4 +1,4 @@
-import { Point } from './panzoom-point';
+import { Point } from './types/point';
 
 export interface PanZoomModel {
   zoomLevel: number;

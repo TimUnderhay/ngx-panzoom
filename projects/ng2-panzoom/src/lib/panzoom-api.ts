@@ -15,4 +15,11 @@ export interface PanZoomAPI {
   panDelta: Function;
   panDeltaPercent: Function;
   panDeltaAbsolute: Function;
+  centerContent: Function;
+  centerX: Function;
+  centerY: Function;
+  centerTopLeft: Function;
+  centerBottomLeft: Function;
+  centerTopRight: Function;
+  centerBottomRight: Function;
 }
