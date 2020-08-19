@@ -94,7 +94,7 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 
     <div style="position: absolute; top: 100px; bottom: 0; left: 0; right: 0;">
 
-      <pan-zoom [config]="panzoomConfig">
+      <pan-zoom [config]="panZoomConfig">
 
         <div style="position: relative;">
 
@@ -111,16 +111,17 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 
 export class MyComponent {
   ...
-  private panZoomConfig: PanZoomConfig = new PanZoomConfig;
+  panZoomConfig: PanZoomConfig = new PanZoomConfig();
   ...
 }
 ```
 
 ## Configuration
+
 You must first create and then pass in a configuration object (of type *PanZoomConfig*) via the `config` input property.  This configuration object also contains RXJS Observables which can be used to work with the API and also observe changes to the panzoom view.
 
 ```typescript
-private panZoomConfig: PanZoomConfig = new PanZoomConfig;
+panZoomConfig: PanZoomConfig = new PanZoomConfig();
 ```
 
 The following attributes are defined:
@@ -155,6 +156,7 @@ noDragFromElementClass              | string    | null              | If set, th
 acceleratePan                       | boolean   | true              | Controls whether the pan frame will be hardware accelerated.
 
 ## API
+
 The panzoom library provides an API for interacting with, observing, and controlling it.  The following methods and objects are available from the PanZoomAPI:
 
   - `model: PanZoomModel`  - The current panzoom model - see the _PanZoomModel_ Interface below.
@@ -232,7 +234,7 @@ import { Subscription } from 'rxjs';
 
 export class MyComponent implements OnInit, OnDestroy {
  
-  private panZoomConfig: PanZoomConfig = new PanZoomConfig;
+  panZoomConfig: PanZoomConfig = new PanZoomConfig();
   private panZoomAPI: PanZoomAPI;
   private apiSubscription: Subscription;
 
@@ -268,7 +270,7 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 
 export class MyComponent implements OnInit, OnDestroy {
  
-  private panZoomConfig: PanZoomConfig = new PanZoomConfig;
+  panZoomConfig: PanZoomConfig = new PanZoomConfig();
   private modelChangedSubscription: Subscription;
 
   ngOnInit(): void {
