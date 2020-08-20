@@ -19,9 +19,9 @@
       "dom"
     ],
     "paths": {
-      "ng2-panzoom": [
-        "dist/ng2-panzoom/ng2-panzoom",
-        "dist/ng2-panzoom"
+      "ngx-panzoom": [
+        "dist/ngx-panzoom/ngx-panzoom",
+        "dist/ngx-panzoom"
       ]
     },
     "allowSyntheticDefaultImports": true

@@ -3,21 +3,21 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ng2-panzoom": {
+    "ngx-panzoom": {
       "projectType": "library",
-      "root": "projects/ng2-panzoom",
-      "sourceRoot": "projects/ng2-panzoom/src",
+      "root": "projects/ngx-panzoom",
+      "sourceRoot": "projects/ngx-panzoom/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
-            "tsConfig": "projects/ng2-panzoom/tsconfig.lib.json",
-            "project": "projects/ng2-panzoom/ng-package.json"
+            "tsConfig": "projects/ngx-panzoom/tsconfig.lib.json",
+            "project": "projects/ngx-panzoom/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/ng2-panzoom/tsconfig.lib.prod.json"
+              "tsConfig": "projects/ngx-panzoom/tsconfig.lib.prod.json"
             }
           }
         },
@@ -25,8 +25,8 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": [
-              "projects/ng2-panzoom/tsconfig.lib.json",
-              "projects/ng2-panzoom/tsconfig.spec.json"
+              "projects/ngx-panzoom/tsconfig.lib.json",
+              "projects/ngx-panzoom/tsconfig.spec.json"
             ],
             "exclude": [
               "**/node_modules/**"
@@ -36,5 +36,5 @@
       }
     }
   },
-  "defaultProject": "ng2-panzoom"
+  "defaultProject": "ngx-panzoom"
 }

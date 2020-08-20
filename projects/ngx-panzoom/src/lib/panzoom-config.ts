@@ -2,9 +2,9 @@ import { BehaviorSubject } from 'rxjs';
 import { Rect } from './types/rect';
 import { PanZoomModel } from './panzoom-model';
 import { PanZoomAPI } from './panzoom-api';
+import { PanZoomConfigOptions } from './types/panzoom-config-options';
 
 export class PanZoomConfig {
-
   zoomLevels = 5;
   neutralZoomLevel = 2;
   scalePerZoomLevel = 2.0;
@@ -58,11 +58,10 @@ export class PanZoomConfig {
     centerBottomLeft: null,
     centerBottomRight: null
   });
-  acceleratePan: true;
+  acceleratePan = true;
 
 
-
-  constructor(options?) {
+  constructor(options?: PanZoomConfigOptions) {
     if (options === undefined) {
       return;
     }

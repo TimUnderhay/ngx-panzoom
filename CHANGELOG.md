@@ -1,6 +1,18 @@
 # Change Log
 
-## 10.0.0
+# 10.0.1
+
+### Changed
+- Renamed the module to `ngx-panzoom`.
+- `Ng2PanZoomModule` is now `NgxPanZoomModule`.
+
+### Added
+- New interface `PanZoomConfigOptions` (thanks @dugnychon!).
+
+### Fixed
+- Fixes for sample code in readme (again, thanks @dugnychon).
+
+# 10.0.0
 
 ### Changed
 - Updated for Angular 10.x.
@@ -20,7 +32,7 @@
 ### Removed
 - jQuery is no longer a dependency.
 
-## 9.0.1
+# 9.0.1
 
 ### Changed
 - Updated to Angular 9.1.12.
@@ -30,13 +42,13 @@
 - Drag-to-pan stops working (resolves https://github.com/KensingtonTech/ng2-panzoom/issues/30).
 
 
-## 9.0.0
+# 9.0.0
 
 ### Changed
 - Updated to Angular 9.0.0.
 
 
-## 8.0.0
+# 8.0.0
 
 ### Changed
 - Version 8.0.0 introduces a new versioning scheme to match Angular releases.  Version 8 of the library is compiled for version 8.x of Angular.  9.0.0 will be for 9.x, and so on.
@@ -46,20 +58,20 @@
 - jQuery is now a peer dependency rather than a dependency -- be sure it's installed in your project with `npm install --save jquery`.
 - You can probably also remove jQuery from 'scripts' in your project's angular.json, as long as it's installed in package.json, and if you're importing it properly in your project (that is if you use jQuery at all).  This is because a typescript import is now used, as opposed to accessing the global '$' object.
 
-## 2.2.0
+# 2.2.0
 
 ### Changed
 - The library has been updated for Angular 8.
 - Addition of configuration parameter `noDragFromElementClass`.
 - Permit all Angular versions in peer dependencies.  This is not a guarantee they will all work, though.
 
-## 2.1.0
+# 2.1.0
 
 ### Changed
 - Configuration options can now be passed to the PanZoomConfig constructor, rather than only being settable after initialisation.
 - Pan mouse button is now configurable via config parameter `dragMouseButton`, with values `left`, `middle`, and `right`.
 
-## 2.0
+# 2.0
 
 Version 2.0 brings enhanced performance, makes adjustments for modern hardware and browsers, cleans up a lot of underlying code, and _may_ also bring backwards-compatibility for Angular 2 (no promises, though).
 

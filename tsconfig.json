@@ -8,7 +8,7 @@
   "files": [],
   "references": [
     {
-      "path": "./projects/ng2-panzoom/tsconfig.lib.json"
+      "path": "./projects/ngx-panzoom/tsconfig.lib.json"
     }
   ]
 }

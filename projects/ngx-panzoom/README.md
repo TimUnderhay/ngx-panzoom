@@ -1,14 +1,24 @@
-# ng2-panzoom
+# ngx-panzoom
 
 An Angular component for panning and zooming an element or elements using the mouse and mousewheel.  Provides rudimentary support for touchscreens (read section on mobile support).  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing in this undertaking.
 
-It is built using Angular CLI 10.x, so it may or may not work with Angular versions earlier than this.  Please excuse the 'ng2' moniker -- I could switch to 'ngx', but I honestly can't be bothered.  It is only tested with the corresponding version of Angular.
+It is built using Angular CLI 10.x, so it may or may not work with Angular versions earlier than this.  It is only tested with the corresponding version of Angular.
 
 This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to alter a certain part of the DOM using CSS transforms, without adding, moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
 
+## A New Name
+
+Just after the release of 10.0, I belatedly decided that the 'ng2' thing had been around long enough, therefore `ng2-panzoom` will be no more, and `ngx-panzoom` will supersede it.
+
+I should've done this at the outset for the 10.0 release.  I accuse myself of amateurism.  Sorry.
+
+1.  `npm uninstall ng2-panzoom --save && npm install ngx-panzoom --save` .
+2.  Be sure to update your module import to reference `NgxPanZoomModule` instead of `Ng2PanZoomModule`
+3.  Update your import statements to reference `ngx-panzoom`.
+
 ## Demo
 
-Click [here](https://kensingtontech.github.io/ng2-panzoom-demo) for a demo of the module.  The demo source can be found [here](https://github.com/KensingtonTech/ng2-panzoom-demo).
+Click [here](https://kensingtontech.github.io/ngx-panzoom-demo) for a demo of the module.  The demo source can be found [here](https://github.com/KensingtonTech/ngx-panzoom-demo).
 
 ## Features
 
@@ -25,6 +35,7 @@ Version 10.x is compiled using Angular 10.x.  Per the Angular guidance at the ti
 
 ## Version 10 Potentially Breaking Changes
 
+- Renamed Ng2PanZoomModule to NgxPanZoomModule.
 - Renamed class panElement to pan-element.
 - Renamed class zoomElement to zoom-element.
 - Renamed class panzoomOverlay to pan-zoom-overlay.
@@ -54,18 +65,18 @@ The library implements some basic support that may work with some mobile devices
 ## Installation
 
 ```
-npm install ng2-panzoom --save
+npm install ngx-panzoom --save
 ```
 
 
 ### app.module.ts:
 
 ```typescript
-import { Ng2PanZoomModule } from 'ng2-panzoom';
+import { NgxPanZoomModule } from 'ngx-panzoom';
 
 @NgModule({
   imports: [  ...,
-              Ng2PanZoomModule
+              NgxPanZoomModule
            ],
   ...
 })
@@ -86,7 +97,7 @@ It also exposes an API which can be used to interact with the pan/zoom view.  Th
 Be sure to place your pan-zoom component underneath an element with a definite height/width, like an absolute-positioned div.  You may not see anything if you don't do this.
 
 ```typescript
-import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
+import { PanZoomConfig, PanZoomAPI, PanZoomModel, PanZoomConfigOptions } from 'ngx-panzoom';
 
 @Component({
   selector: 'my-component'
@@ -94,7 +105,7 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 
     <div style="position: absolute; top: 100px; bottom: 0; left: 0; right: 0;">
 
-      <pan-zoom [config]="panzoomConfig">
+      <pan-zoom [config]="panZoomConfig">
 
         <div style="position: relative;">
 
@@ -111,16 +122,17 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 
 export class MyComponent {
   ...
-  private panZoomConfig: PanZoomConfig = new PanZoomConfig;
+  panZoomConfig: PanZoomConfig = new PanZoomConfig();
   ...
 }
 ```
 
 ## Configuration
-You must first create and then pass in a configuration object (of type *PanZoomConfig*) via the `config` input property.  This configuration object also contains RXJS Observables which can be used to work with the API and also observe changes to the panzoom view.
+
+You must first create and then pass in a configuration object (of type *PanZoomConfig*) via the `config` input property.  This configuration object also contains RXJS Observables which can be used to work with the API and also observe changes to the panzoom view.  The parameters can either be passed in as a PanZoomConfigOptions object, or set after the creation of the PanZoomConfig instance.
 
 ```typescript
-private panZoomConfig: PanZoomConfig = new PanZoomConfig;
+panZoomConfig: PanZoomConfig = new PanZoomConfig(options?: PanZoomConfigOptions);
 ```
 
 The following attributes are defined:
@@ -155,6 +167,7 @@ noDragFromElementClass              | string    | null              | If set, th
 acceleratePan                       | boolean   | true              | Controls whether the pan frame will be hardware accelerated.
 
 ## API
+
 The panzoom library provides an API for interacting with, observing, and controlling it.  The following methods and objects are available from the PanZoomAPI:
 
   - `model: PanZoomModel`  - The current panzoom model - see the _PanZoomModel_ Interface below.
@@ -225,14 +238,14 @@ interface Rect {
 The panzoom API is exposed through an RxJS observable as a property of the `PanZoomConfig` class, named `api`, to which you simply subscribe to obtain the API object.  The subscription callback method will be passed the API as its only parameter, of type `PanZoomAPI`.  Because it uses a BehaviorSubject, the callback will immediately trigger when subscribed to, assuming panzoom has already been initialised.  If panzoom hasn't yet been initialised, the subscription callback will fire as soon as initialisation occurs.
 
 ```typescript
-import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
+import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ngx-panzoom';
 import { Subscription } from 'rxjs';
 
 @Component({ ... })
 
 export class MyComponent implements OnInit, OnDestroy {
  
-  private panZoomConfig: PanZoomConfig = new PanZoomConfig;
+  panZoomConfig: PanZoomConfig = new PanZoomConfig();
   private panZoomAPI: PanZoomAPI;
   private apiSubscription: Subscription;
 
@@ -262,13 +275,13 @@ The PanZoomConfig class has an RXJS observable (`modelChanged`) which can be use
 ### Example modelChanged Subscription
 
 ```typescript
-import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
+import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ngx-panzoom';
 
 @Component({ ... })
 
 export class MyComponent implements OnInit, OnDestroy {
  
-  private panZoomConfig: PanZoomConfig = new PanZoomConfig;
+  panZoomConfig: PanZoomConfig = new PanZoomConfig();
   private modelChangedSubscription: Subscription;
 
   ngOnInit(): void {

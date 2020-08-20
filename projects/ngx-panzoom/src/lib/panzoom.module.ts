@@ -8,4 +8,4 @@ import { PanZoomComponent } from './panzoom.component';
   exports: [ PanZoomComponent ]
 })
 
-export class Ng2PanZoomModule { }
+export class NgxPanZoomModule {}
