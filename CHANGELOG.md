@@ -1,6 +1,13 @@
 # Change Log
 
-# 10.0.1
+# 10.2.0
+
+### Added
+- Config option `dynamicContentDimensions`
+- API method `detectContentDimensions()`
+- API method `updateContentDimensions()`
+
+# 10.1.0
 
 ### Changed
 - Renamed the module to `ngx-panzoom`.

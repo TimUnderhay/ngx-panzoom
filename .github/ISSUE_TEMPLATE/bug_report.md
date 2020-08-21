@@ -13,7 +13,7 @@ A clear and concise description of what the bug is.
 **Reduced Test Case**
 Please include a reduced test case which demonstrates the issue.  Issues that do not include a reduced test case will likely not be accepted.
 
-Use this url as a starting point for your test case: `https://stackblitz.com/edit/ngx-panzoom-test-10-1-0`.  Simply fork it, add your code which demonstrates the bug, and include the URL here.
+Use this url as a starting point for your test case: `https://stackblitz.com/edit/ngx-panzoom-test-10-2-0`.  Simply fork it, add your code which demonstrates the bug, and include the URL here.
 
 Please note that Chrome browsers which block third-party cookies may require an exception for `[*.]stackblitz.io`, to get the Stackblitz preview working.
 

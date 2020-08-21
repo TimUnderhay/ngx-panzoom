@@ -30,4 +30,5 @@ export interface PanZoomConfigOptions {
   modelChanged?: BehaviorSubject<PanZoomModel>;
   api?: BehaviorSubject<PanZoomAPI>;
   acceleratePan?: boolean;
+  dynamicContentDimensions: boolean;
 }

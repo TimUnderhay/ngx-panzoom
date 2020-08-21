@@ -77,6 +77,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   private minScale: number; // the smallest scale (furthest zoomed out) that we will allow in free zoom mode (calculated)
   private minimumAllowedZoomLevel: number;
 
+  private resizeObserver: any; // waiting for a Typescript definition for ResizeObserver
+
 
 
   ngOnInit(): void {
@@ -127,7 +129,9 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       centerTopLeft: this.centerTopLeftCorner.bind(this),
       centerBottomLeft: this.centerBottomLeftCorner.bind(this),
       centerTopRight: this.centerTopRightCorner.bind(this),
-      centerBottomRight: this.centerBottomRightCorner.bind(this)
+      centerBottomRight: this.centerBottomRightCorner.bind(this),
+      updateContentDimensions: this.updateContentDimensions.bind(this),
+      detectContentDimensions: this.detectContentDimensions.bind(this)
     };
 
     this.config.api.next(this.api);
@@ -188,9 +192,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     // console.log('PanZoomComponent: ngAfterViewInit()');
 
-    const zoomFrameStyle  = getComputedStyle(this.zoomElementRef.nativeElement);
-    this.contentHeight = parseInt( zoomFrameStyle.getPropertyValue('height').split('px')[0] );
-    this.contentWidth = parseInt( zoomFrameStyle.getPropertyValue('width').split('px')[0] );
+    this.detectContentDimensions();
 
     const frameStyle = getComputedStyle(this.frameElementRef.nativeElement);
     this.frameHeight = parseInt( frameStyle.getPropertyValue('height').split('px')[0] );
@@ -198,14 +200,26 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.zone.runOutsideAngular( () => this.animationFrameFunc = window.requestAnimationFrame );
 
+    if (this.config.dynamicContentDimensions) {
+      if ((window as any).ResizeObserver) {
+        this.resizeObserver = new (window as any).ResizeObserver( entries => this.onContentDimensionsChangeDetected(entries) );
+        this.zone.runOutsideAngular( () => this.resizeObserver.observe(this.zoomElementRef.nativeElement) );
+      }
+      else {
+        console.error('ResizeObserver API is not supported by this browser.  See https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver for info on browser compatibility.');
+      }
+    }
+
     if (this.isMobileDevice()) {
       this.isMobile = true;
       this.zone.runOutsideAngular( () => this.frameElementRef.nativeElement.addEventListener('touchstart', this.onTouchStart ) );
     }
     else {
-      this.zone.runOutsideAngular( () => this.frameElementRef.nativeElement.addEventListener('mousedown', this.onMousedown ) );
-      this.zone.runOutsideAngular( () => this.frameElementRef.nativeElement.addEventListener('dblclick', this.onDblClick ) );
-      this.zone.runOutsideAngular( () => this.frameElementRef.nativeElement.addEventListener('wheel', (event) => this.animationFrameFunc( () => this.onMouseWheel(event) ), { passive: true } ) );
+      this.zone.runOutsideAngular( () => {
+        this.frameElementRef.nativeElement.addEventListener('mousedown', this.onMousedown);
+        this.frameElementRef.nativeElement.addEventListener('dblclick', this.onDblClick );
+        this.frameElementRef.nativeElement.addEventListener('wheel', (event) => this.animationFrameFunc( () => this.onMouseWheel(event) ), { passive: true } );
+      } );
     }
 
   }
@@ -224,6 +238,9 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if (this.animationFrameFunc && this.animationId) {
       window.cancelAnimationFrame(this.animationId);
+    }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
     }
     switch (this.config.dragMouseButton) {
       case 'middle':
@@ -990,6 +1007,14 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
 
+  private onContentDimensionsChangeDetected(entries: any[]) {
+    // callback for ResizeObserver
+    this.contentHeight = entries[0].contentRect.height;
+    this.contentWidth = entries[0].contentRect.width;
+  }
+
+
+
 
 
 
@@ -1285,6 +1310,25 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
       y: this.contentHeight
     },
     duration);
+  }
+
+
+
+  private updateContentDimensions(width?: number, height?: number) {
+    if (height !== undefined) {
+      this.contentHeight = height;
+    }
+    if (width !== undefined) {
+      this.contentWidth = width;
+    }
+  }
+
+
+
+  private detectContentDimensions() {
+    const zoomFrameStyle  = getComputedStyle(this.zoomElementRef.nativeElement);
+    this.contentHeight = parseInt( zoomFrameStyle.getPropertyValue('height').split('px')[0] );
+    this.contentWidth = parseInt( zoomFrameStyle.getPropertyValue('width').split('px')[0] );
   }
 
 

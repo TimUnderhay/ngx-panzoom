@@ -56,9 +56,12 @@ export class PanZoomConfig {
     centerTopLeft: null,
     centerTopRight: null,
     centerBottomLeft: null,
-    centerBottomRight: null
+    centerBottomRight: null,
+    updateContentDimensions: null,
+    detectContentDimensions: null
   });
   acceleratePan = true;
+  dynamicContentDimensions = false;
 
 
   constructor(options?: PanZoomConfigOptions) {
@@ -139,6 +142,9 @@ export class PanZoomConfig {
     }
     if ('acceleratePan' in options) {
       this.acceleratePan = options.acceleratePan;
+    }
+    if ('dynamicContentDimensions' in options) {
+      this.dynamicContentDimensions = options.dynamicContentDimensions;
     }
   }
 }

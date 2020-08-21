@@ -22,4 +22,6 @@ export interface PanZoomAPI {
   centerBottomLeft: Function;
   centerTopRight: Function;
   centerBottomRight: Function;
+  updateContentDimensions: Function;
+  detectContentDimensions: Function;
 }
