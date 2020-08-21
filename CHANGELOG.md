@@ -1,6 +1,11 @@
 # Change Log
 
-# 10.2.0
+# 10.2.1
+
+### Fixed
+- `dynamicContentDimensions` config option was marked as mandatory
+
+# 10.2.1
 
 ### Added
 - Config option `dynamicContentDimensions`
