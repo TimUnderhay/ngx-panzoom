@@ -33,6 +33,9 @@ Version 10.x is compiled using Angular 10.x.  Per the Angular guidance at the ti
 - Updated for and compiled with Angular 10.x.
 - New API helper methods `centerContent()`, `centerTopLeft()`, `centerBottomLeft()`, `centerTopRight()`, `centerBottomRight()`, `centerX()`, and `centerY()`
 - Config option `dynamicContentDimensions`, and new API methods `detectContentDimensions()` and `updateContentDimensions()` for when the content size isn't predictable.
+- Added options `lastPoint` (default for backwards-compatibility) and `viewCenter` to `zoomIn()` and `zoomOut()` API methods.  Defines which point to zoom to/from: either the centre of the screen or the last point zoomed to/from.
+- Added proper TypeScript definitions for API methods.
+- Several bug fixes.
 
 ## Version 10 Potentially Breaking Changes
 
@@ -47,7 +50,7 @@ Version 10.x is compiled using Angular 10.x.  Per the Angular guidance at the ti
 - **Free zoom** - zooming is no longer limited to switching between two distinct zoom levels.  Zoom can now be smoothly and freely controlled using the mouse wheel or trackpad.
 - `zoomToFit()` animation - using the zoomToFit() function now will animate the view to the a desired rectangle.
 - A convenience method `resetView()` has been provided to animate the view back to its initial settings.
-- The `zoomIn()` and `zoomOut()` API functions now zoom to the last zoomed point rather than the centre point, unless no zoom point has been defined yet.
+- The `zoomIn()` and `zoomOut()` API functions can zoom to either the last zoomed point rather or to the view's centre point, depending on the value of `zoomType` (`lastPoint` or `viewCenter`).
 - New API methods `panToPoint()`, `panDelta()`, `panDeltaPercent()`,  `panDeltaAbsolute()`, and many others have been added.
 - Many performance improvements.
 - The widget has not been migrated from the original project, though this probably shouldn't be hard to do.  Pull requests are welcome!
@@ -178,9 +181,9 @@ The panzoom library provides an API for interacting with, observing, and control
 
   - `changeZoomLevel(newZoomLevel: number, clickPoint: Point)` - This method will reset the view to _newZoomLevel_, with _clickPoint_ as its centre point.
 
-  - `zoomIn()` - This will zoom the view in to the last zoomed point by one zoom level.
+  - `zoomIn(zoomType: 'lastPoint' | 'viewCenter' = 'lastPoint')` - This will zoom the view in to either the last zoomed point (if _lastPoint_), or to the centre point of the view (_viewCenter_), by one zoom level.  The default zoomType is `lastPoint`.
 
-  - `zoomOut()` - This will zoom the view out from the last zoomed point by one zoom level.
+   - `zoomOut(zoomType: 'lastPoint' | 'viewCenter' = 'lastPoint')` - This will zoom the view out from either the last zoomed point (if _lastPoint_), or from the centre point of the view (_viewCenter_), by one zoom level.  The default zoomType is `lastPoint`.
 
   - `zoomToFit(rectangle: Rect, [duration: number])` - Animates the view to focus on a rectangle of the underlying canvas.  **duration** is how long the animation should take (in seconds), and is optional.  **rectangle** is two coordinates on the canvas which the panZoom view is pan/zooming.  See the below section on PanZoom Interfaces for its definition.
  

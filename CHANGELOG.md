@@ -1,16 +1,35 @@
 # Change Log
 
+# 10.3.0
+
+### Added
+- Added options `lastPoint` (default for backwards-compatibility) and `viewCenter` to `zoomIn()` and `zoomOut()` API methods.  Defines which point to zoom to/from: either the centre of the screen or the last point zoomed to/from.
+- Proper TypeScript definitions for API methods.
+- Interface 'ZoomType'.
+
+### Fixed
+- Fixes for `model.isPanning` remaining true after pan end.
+- `model.isPanning` was not being set for panning API calls.
+- Fix for jump when freeZoom occurs during slowToHalt animation.
+
+### Changed
+- Batch apply zoom transforms for (possibly) better zoom performance / fewer reflows.
+- Set minimum Angular peer dependency version to 2.0.0.  Note that this doesn't mean it's being tested with 2.0 or anything other than the most current Angular release.
+
+
 # 10.2.1
 
 ### Fixed
 - `dynamicContentDimensions` config option was marked as mandatory
 
-# 10.2.1
+
+# 10.2.0
 
 ### Added
 - Config option `dynamicContentDimensions`
 - API method `detectContentDimensions()`
 - API method `updateContentDimensions()`
+
 
 # 10.1.0
 
