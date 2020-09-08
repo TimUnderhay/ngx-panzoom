@@ -173,7 +173,7 @@ dynamicContentDimensions                       | boolean   | false              
 
 ## Events
 
-- `panEnded` - Emits when the animation for a pan has ended
+- `panEnded(point: Point)` - Emits when the animation for a pan has ended
 
 ## API
 

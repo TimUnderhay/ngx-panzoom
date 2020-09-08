@@ -46,7 +46,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('panzoomOverlay', { static: true }) private panzoomOverlayRef: ElementRef;
 
   @Input() private config: PanZoomConfig;
-  @Output() panEnded = new EventEmitter();
+  @Output() panEnded = new EventEmitter<Point>();
 
   private base: PanZoomModel; // this is what the pan/zoom view is before a zoom animation begins and after it ends.  It also updates with every mouse drag or freeZoom, but the animation is mostly tied to the model.
   private model: PanZoomModel; // this is used for incremental changes to the pan/zoom view during each animation frame.  Setting it will update the pan/zoom coordinates on the next call to updateDOM().  Not used during mouse drag.
