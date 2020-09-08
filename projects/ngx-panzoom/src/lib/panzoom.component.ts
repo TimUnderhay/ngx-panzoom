@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild, Input, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild, Input, NgZone, Output, EventEmitter } from '@angular/core';
 import { PanZoomConfig } from './panzoom-config';
 import { PanZoomModel } from './panzoom-model';
 import { PanZoomAPI, ZoomType } from './panzoom-api';
@@ -46,6 +46,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('panzoomOverlay', { static: true }) private panzoomOverlayRef: ElementRef;
 
   @Input() private config: PanZoomConfig;
+  @Output() panEnded = new EventEmitter();
 
   private base: PanZoomModel; // this is what the pan/zoom view is before a zoom animation begins and after it ends.  It also updates with every mouse drag or freeZoom, but the animation is mostly tied to the model.
   private model: PanZoomModel; // this is used for incremental changes to the pan/zoom view during each animation frame.  Setting it will update the pan/zoom coordinates on the next call to updateDOM().  Not used during mouse drag.
@@ -354,7 +355,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
         };
         this.lastMouseEventTime = event.timeStamp;
         this.isDragging = true;
-        this.model.isPanning = false;
+        // this.model.isPanning = false;
+        this.stopPanning(this.model.pan);
 
         if (this.isMobile) {
           this.zone.runOutsideAngular( () => document.addEventListener('touchend', this.onTouchEnd, false ) ); // leave this on document
@@ -370,6 +372,11 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+
+  private stopPanning(point: Point) {
+    this.model.isPanning = false;
+    this.panEnded.emit(point);
+  }
 
 
   private onTouchStart = (event: TouchEvent) => {
@@ -563,7 +570,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     else {
       this.panVelocity = undefined;
       this.dragFinishing = false;
-      this.model.isPanning = false;
+      // this.model.isPanning = false;
+      this.stopPanning(this.model.pan);
       this.config.modelChanged.next(this.model);
       this.syncBaseToModel();
     }
@@ -739,8 +747,9 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     else {
       // Animation has ended
       if (this.model.isPanning) {
-        this.model.isPanning = false;
-      } 
+        // this.model.isPanning = false;
+        this.stopPanning(this.model.pan);
+      }
       this.syncBaseToModel();
       this.config.modelChanged.next(this.model);
       this.scale = this.getCssScale(this.base.zoomLevel);
@@ -851,7 +860,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // Apply Pan & Scale
     const translate3d = `translate3d(${targetPoint.x}px, ${targetPoint.y}px, 0)`;
     this.panElementRef.nativeElement.style.transform = translate3d;
-    
+
     const scaleString = `scale(${this.scale})`;
     let zoomStyle = `transform-origin: 0 0; transform: ${scaleString};`;
     if (this.isChrome) {
@@ -986,7 +995,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     else if (zoomType === 'viewCenter') {
       this.changeZoomLevel( this.base.zoomLevel + this.config.zoomButtonIncrement, this.getCentrePoint() );
     }
-    
+
   }
 
 
