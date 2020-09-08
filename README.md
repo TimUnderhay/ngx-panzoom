@@ -166,10 +166,14 @@ modelChanged                        | BehaviorSubject&lt;PanZoomModel>      | No
 keepInBounds                        | boolean   | false             | When true, it will not be possible to pan the contents off the screen -- it will snap back when trying to do so.  It will not be possible to zoom further out than the neutral zoom level.  *REMEMBER* that the initial zoom level must either be less than or equal to the neutral zoom level, or weird things will happen.
 keepInBoundsRestoreForce            | number    | 0.5               | Constant to control how quickly the contents snap back into place after attempting to pan out of bounds.
 keepInBoundsDragPullback            | number    | 0.7               | Constant to control the perceived force preventing dragging the contents out of bounds.
-dragMouseButton                     | string    | 'left'            | Controls which mouse button drags the view.  Valid options are `left`, `middle`, and `right`.  *NOTE:* Using `middle` and `right` will disable the default 'auxclick' and 'contextmenu' handlers, respectively.  *ALSO NOTE:* Chrome seems to have a bug that doesn't the permit the 'mousemove' event to fire after middle-click drag until it receives a normal left 'click' event.  If anyone can shed any light on this, I'd be happy to hear from you.  It's such an edge case, though, that I won't be opening a bug report, but feel free to do so if this affects you. 
+dragMouseButton                     | string    | 'left'            | Controls which mouse button drags the view.  Valid options are `left`, `middle`, and `right`.  *NOTE:* Using `middle` and `right` will disable the default 'auxclick' and 'contextmenu' handlers, respectively.  *ALSO NOTE:* Chrome seems to have a bug that doesn't the permit the 'mousemove' event to fire after middle-click drag until it receives a normal left 'click' event.  If anyone can shed any light on this, I'd be happy to hear from you.  It's such an edge case, though, that I won't be opening a bug report, but feel free to do so if this affects you.
 noDragFromElementClass              | string    | null              | If set, this will prevent click-drag on elements who have a parent element containing a specific class name.
 acceleratePan                       | boolean   | true              | Controls whether the pan frame will be hardware accelerated.
 dynamicContentDimensions                       | boolean   | false              | If true, a ResizeObserver will be used to detect changes in the content dimensions.  Useful if the content dimensions can't be predicted.  Alternatively, the API methods `detectContentDimensions()` or `contentDimensionsChanged()` can also be used.  ResizeObservers may not work in some older or mobile web browsers.  See https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver for info on browser compatibility.
+
+## Events
+
+- `panEnded` - Emits when the animation for a pan has ended
 
 ## API
 
@@ -186,11 +190,11 @@ The panzoom library provides an API for interacting with, observing, and control
    - `zoomOut(zoomType: 'lastPoint' | 'viewCenter' = 'lastPoint')` - This will zoom the view out from either the last zoomed point (if _lastPoint_), or from the centre point of the view (_viewCenter_), by one zoom level.  The default zoomType is `lastPoint`.
 
   - `zoomToFit(rectangle: Rect, [duration: number])` - Animates the view to focus on a rectangle of the underlying canvas.  **duration** is how long the animation should take (in seconds), and is optional.  **rectangle** is two coordinates on the canvas which the panZoom view is pan/zooming.  See the below section on PanZoom Interfaces for its definition.
- 
+
   - `resetView()` - A shortcut method to reset the pan and zoom back to the initial view.
-  
+
   - `getViewPosition(modelPosition: Point)` - By passing in x,y coordinates of the original, untransformed content canvas, it will return the current pixel position of this point.
-  
+
   - `getModelPosition(viewPosition: Point)` - The reverse operation of getViewPosition().
 
   - `panToPoint(point: Point, [duration: number])` - Will animate the view so that the centre point of the view is at the *point* parameter coordinates, relative to the original, unzoomed content width and height.
@@ -198,7 +202,7 @@ The panzoom library provides an API for interacting with, observing, and control
   - `panDelta(delta: Point, [duration: number])` - Will pan the view left, right, up, or down, based on a number of pixels relative to the original, unzoomed content.
 
   - `panDeltaPercent(deltaPercent: Point, [duration: number])` - Will pan the view up, down, left, or right, based on a percentage of the original, unzoomed content width and height.
-  
+
   - `panDeltaAbsolute(delta: Point, [duration: number])` - Will pan the view left, right, up, or down, based on a number of pixels.  This method doesn't adjust for scale.  I'm not sure why you'd want this, but it's provided just in case.
 
   - `centerContent([duration: number])` - Will centre the the content vertically and horizontally at the current scale.
@@ -253,7 +257,7 @@ import { Subscription } from 'rxjs';
 @Component({ ... })
 
 export class MyComponent implements OnInit, OnDestroy {
- 
+
   panZoomConfig: PanZoomConfig = new PanZoomConfig();
   private panZoomAPI: PanZoomAPI;
   private apiSubscription: Subscription;
@@ -289,7 +293,7 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ngx-panzoom';
 @Component({ ... })
 
 export class MyComponent implements OnInit, OnDestroy {
- 
+
   panZoomConfig: PanZoomConfig = new PanZoomConfig();
   private modelChangedSubscription: Subscription;
 
