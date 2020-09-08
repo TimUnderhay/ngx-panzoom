@@ -355,8 +355,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
         };
         this.lastMouseEventTime = event.timeStamp;
         this.isDragging = true;
-        // this.model.isPanning = false;
-        this.stopPanning(this.model.pan);
+        this.model.isPanning = false;
 
         if (this.isMobile) {
           this.zone.runOutsideAngular( () => document.addEventListener('touchend', this.onTouchEnd, false ) ); // leave this on document
@@ -370,12 +369,6 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
 
       return false;
     }
-  }
-
-
-  private stopPanning(point: Point) {
-    this.model.isPanning = false;
-    this.panEnded.emit(point);
   }
 
 
@@ -570,8 +563,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     else {
       this.panVelocity = undefined;
       this.dragFinishing = false;
-      // this.model.isPanning = false;
-      this.stopPanning(this.model.pan);
+      this.model.isPanning = false;
       this.config.modelChanged.next(this.model);
       this.syncBaseToModel();
     }
@@ -747,8 +739,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     else {
       // Animation has ended
       if (this.model.isPanning) {
-        // this.model.isPanning = false;
-        this.stopPanning(this.model.pan);
+        this.model.isPanning = false;
+        this.panEnded.next(this.model.pan);
       }
       this.syncBaseToModel();
       this.config.modelChanged.next(this.model);
