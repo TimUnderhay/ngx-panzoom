@@ -1,11 +1,11 @@
 {
-  "name": "ngx-panzoom",
-  "author": "Tim Underhay",
+  "name": "ngx-pan-zoom",
+  "author": "Chrillewoodz",
   "license": "MIT",
-  "homepage": "https://github.com/kensingtontech/ngx-panzoom",
+  "homepage": "https:/github.com/chrillewoodz/ngx-panzoom",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KensingtonTech/ngx-panzoom.git"
+    "url": "https:/github.com/chrillewoodz/ngx-panzoom"
   },
   "version": "10.3.0",
   "peerDependencies": {

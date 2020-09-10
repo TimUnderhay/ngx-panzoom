@@ -1,6 +1,6 @@
-import { PanZoomApi } from './panzoom.api';
 import { NgModule } from '@angular/core';
 import { PanZoomComponent } from './panzoom.component';
+import { PanZoomApi } from '../panzoom.api';
 
 @NgModule({
   imports: [],
