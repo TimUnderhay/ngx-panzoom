@@ -1,8 +1,7 @@
-import { BehaviorSubject } from 'rxjs';
-import { Rect } from './types/rect';
-import { PanZoomModel } from './panzoom-model';
-import { PanZoomAPI } from './panzoom-api';
-import { PanZoomConfigOptions } from './types/panzoom-config-options';
+// import { BehaviorSubject } from 'rxjs';
+import { PanZoomConfigOptions, Rect } from './interfaces';
+// import { PanZoomModel } from './panzoom-model';
+// import { PanZoomAPI } from './panzoom-api';
 
 export class PanZoomConfig {
   zoomLevels = 5;
@@ -28,38 +27,38 @@ export class PanZoomConfig {
   freeMouseWheel = true;
   freeMouseWheelFactor = 0.08;
   noDragFromElementClass: string;
-  modelChanged: BehaviorSubject<PanZoomModel> = new BehaviorSubject<PanZoomModel>({
-    isPanning: null,
-    zoomLevel: null,
-    pan: {
-      x: null,
-      y: null
-    }
-  });
-  api: BehaviorSubject<PanZoomAPI> = new BehaviorSubject<PanZoomAPI>({
-    model: null,
-    config: null,
-    changeZoomLevel: null,
-    zoomIn: null,
-    zoomOut: null,
-    zoomToFit: null,
-    getViewPosition: null,
-    getModelPosition: null,
-    resetView: null,
-    panToPoint: null,
-    panDelta: null,
-    panDeltaPercent: null,
-    panDeltaAbsolute: null,
-    centerContent: null,
-    centerX: null,
-    centerY: null,
-    centerTopLeft: null,
-    centerTopRight: null,
-    centerBottomLeft: null,
-    centerBottomRight: null,
-    updateContentDimensions: null,
-    detectContentDimensions: null
-  });
+  // modelChanged: BehaviorSubject<PanZoomModel> = new BehaviorSubject<PanZoomModel>({
+  //   isPanning: null,
+  //   zoomLevel: null,
+  //   pan: {
+  //     x: null,
+  //     y: null
+  //   }
+  // });
+  // api: BehaviorSubject<PanZoomAPI> = new BehaviorSubject<PanZoomAPI>({
+  //   model: null,
+  //   config: null,
+  //   changeZoomLevel: null,
+  //   zoomIn: null,
+  //   zoomOut: null,
+  //   zoomToFit: null,
+  //   getViewPosition: null,
+  //   getModelPosition: null,
+  //   resetView: null,
+  //   panToPoint: null,
+  //   panDelta: null,
+  //   panDeltaPercent: null,
+  //   panDeltaAbsolute: null,
+  //   centerContent: null,
+  //   centerX: null,
+  //   centerY: null,
+  //   centerTopLeft: null,
+  //   centerTopRight: null,
+  //   centerBottomLeft: null,
+  //   centerBottomRight: null,
+  //   updateContentDimensions: null,
+  //   detectContentDimensions: null
+  // });
   acceleratePan = true;
   dynamicContentDimensions = false;
 

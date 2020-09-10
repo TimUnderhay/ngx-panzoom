@@ -1,0 +1,9 @@
+  <div class="map">
+  <pan-zoom [config]="panZoomConfig">
+
+
+      <div *ngFor="let row of rows" class="row">
+        <div *ngFor="let col of columns" class="column"></div>
+      </div>
+    </pan-zoom>
+</div>
