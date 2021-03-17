@@ -342,7 +342,10 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (event.button === this.dragMouseButton || event.type === 'touchstart') {
-      event.preventDefault();
+
+      if (event.type !== 'touchstart') {
+        event.preventDefault();
+      }
 
       this.dragFinishing = false;
       this.panVelocity = undefined;
@@ -376,7 +379,7 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // console.log('PanZoomComponent: onTouchStart()', event);
     // console.log('PanZoomComponent: onTouchStart(): touches:', event.touches.length);
 
-    event.preventDefault();
+    //event.preventDefault();
 
     if (event.touches.length !== 1) {
       // multiple touches, get ready for zooming
@@ -403,7 +406,17 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // timestamp - 10587.879999999132 - milliseconds
     // Called when moving the mouse with the left button down
 
-    if (!(event && event.pageX && event.pageY)) {
+    let evWrap;
+    if (event && event.pageX && event.pageY) {
+      evWrap = event;
+    }
+    else if ((event.type === 'touchmove') && event.touches[0].pageX && event.touches[0].pageY) {
+      evWrap = { 
+        pageX: event.touches[0].pageX,
+        pageY: event.touches[0].pageY
+      }
+    }
+    else {
       return;
     }
 
@@ -412,8 +425,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     this.lastMouseEventTime = now;
     const dragDelta = {
       // a representation of how far each coordinate has moved since the last time it was moved
-      x: event.pageX - this.previousPosition.x,
-      y: event.pageY - this.previousPosition.y
+      x: evWrap.pageX - this.previousPosition.x,
+      y: evWrap.pageY - this.previousPosition.y
     };
 
     if (this.config.keepInBounds) {
@@ -476,8 +489,8 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
     // console.log(`PanZoomComponent: onMouseMove(): panVelocity:`, this.panVelocity);
 
     this.previousPosition = {
-      x: event.pageX,
-      y: event.pageY
+      x: evWrap.pageX,
+      y: evWrap.pageY
     };
 
   }
@@ -538,11 +551,13 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy {
   private onMouseUp = (event) => {
     // console.log('PanZoomComponent: onMouseup()', event);
 
-    if (event.button !== this.dragMouseButton) {
+    if ((event.button !== this.dragMouseButton) && (event.type !== 'touchend')) {
       return;
     }
 
-    event.preventDefault();
+    if (event.type !== 'touchend') {
+      event.preventDefault();
+    }
 
     const now = event.timeStamp;
     const timeSinceLastMouseEvent = (now - this.lastMouseEventTime) / 1000;
