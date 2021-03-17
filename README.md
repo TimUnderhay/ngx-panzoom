@@ -6,15 +6,9 @@ It is built using Angular CLI 10.x, so it may or may not work with Angular versi
 
 This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
 
-## A New Name
+## This Module is on Life Support -- New Maintainer Needed!
 
-Just after the release of 10.0, I belatedly decided that the 'ng2' thing had been around long enough, therefore `ng2-panzoom` will be no more, and `ngx-panzoom` will supersede it.
-
-I should've done this at the outset for the 10.0 release.  I accuse myself of amateurism.  Sorry.
-
-1.  `npm uninstall ng2-panzoom --save && npm install ngx-panzoom --save` .
-2.  Be sure to update your module import to reference `NgxPanZoomModule` instead of `Ng2PanZoomModule`
-3.  Update your import statements to reference `ngx-panzoom`.
+Doubtless many will have noticed that there has been little by way of support for this library as of late.  Sadly, other life priorities just don't allow the time for it, and that doesn't seem likely to change in the near future.  If there is some brave soul out there would like to take over the maintenance of this module, please do contact me and I'll be happy to discuss it with you.
 
 ## Demo
 
@@ -24,6 +18,12 @@ Click [here](https://kensingtontech.github.io/ngx-panzoom-demo) for a demo of th
 
 - Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 - Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
+
+# Version 11.x Changes
+
+- Updated for Angular 11.x.
+- Improved single-touch pan handling (thanks to @dexterbt1).
+- Fix for config input being marked as private.
 
 # Version 10.x Changes
 
