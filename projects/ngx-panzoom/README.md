@@ -4,17 +4,11 @@ An Angular component for panning and zooming an element or elements using the mo
 
 It is built using Angular CLI 10.x, so it may or may not work with Angular versions earlier than this.  It is only tested with the corresponding version of Angular.
 
-This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to alter a certain part of the DOM using CSS transforms, without adding, moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
+This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
 
-## A New Name
+## This Module is on Life Support -- New Maintainer Needed!
 
-Just after the release of 10.0, I belatedly decided that the 'ng2' thing had been around long enough, therefore `ng2-panzoom` will be no more, and `ngx-panzoom` will supersede it.
-
-I should've done this at the outset for the 10.0 release.  I accuse myself of amateurism.  Sorry.
-
-1.  `npm uninstall ng2-panzoom --save && npm install ngx-panzoom --save` .
-2.  Be sure to update your module import to reference `NgxPanZoomModule` instead of `Ng2PanZoomModule`
-3.  Update your import statements to reference `ngx-panzoom`.
+Doubtless many will have noticed that there has been little by way of support for this library as of late.  Sadly, other life priorities just don't allow the time for it, and that doesn't seem likely to change in the near future.  If there is some brave soul out there would like to take over the maintenance of this module, please do contact me and I'll be happy to discuss it with you.
 
 ## Demo
 
@@ -25,13 +19,23 @@ Click [here](https://kensingtontech.github.io/ngx-panzoom-demo) for a demo of th
 - Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 - Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
 
-# Version 10 Changes
+# Version 11.x Changes
+
+- Updated for Angular 11.x.
+- Improved single-touch pan handling (thanks to @dexterbt1).
+- Fix for config input being marked as private.
+
+# Version 10.x Changes
 
 Version 10.x is compiled using Angular 10.x.  Per the Angular guidance at the time of writing (`https://angular.io/guide/creating-libraries`), Ivy is not used for the NPM repo build.  The following changes have been made:
 
 - The jQuery dependency has finally been removed!
 - Updated for and compiled with Angular 10.x.
 - New API helper methods `centerContent()`, `centerTopLeft()`, `centerBottomLeft()`, `centerTopRight()`, `centerBottomRight()`, `centerX()`, and `centerY()`
+- Config option `dynamicContentDimensions`, and new API methods `detectContentDimensions()` and `updateContentDimensions()` for when the content size isn't predictable.
+- Added options `lastPoint` (default for backwards-compatibility) and `viewCenter` to `zoomIn()` and `zoomOut()` API methods.  Defines which point to zoom to/from: either the centre of the screen or the last point zoomed to/from.
+- Added proper TypeScript definitions for API methods.
+- Several bug fixes.
 
 ## Version 10 Potentially Breaking Changes
 
@@ -46,8 +50,8 @@ Version 10.x is compiled using Angular 10.x.  Per the Angular guidance at the ti
 - **Free zoom** - zooming is no longer limited to switching between two distinct zoom levels.  Zoom can now be smoothly and freely controlled using the mouse wheel or trackpad.
 - `zoomToFit()` animation - using the zoomToFit() function now will animate the view to the a desired rectangle.
 - A convenience method `resetView()` has been provided to animate the view back to its initial settings.
-- The `zoomIn()` and `zoomOut()` API functions now zoom to the last zoomed point rather than the centre point, unless no zoom point has been defined yet.
-- New API methods `panToPoint()`, `panDelta()`, `panDeltaPercent()`, and `panDeltaAbsolute()` have been added for panning the view.
+- The `zoomIn()` and `zoomOut()` API functions can zoom to either the last zoomed point rather or to the view's centre point, depending on the value of `zoomType` (`lastPoint` or `viewCenter`).
+- New API methods `panToPoint()`, `panDelta()`, `panDeltaPercent()`,  `panDeltaAbsolute()`, and many others have been added.
 - Many performance improvements.
 - The widget has not been migrated from the original project, though this probably shouldn't be hard to do.  Pull requests are welcome!
 - Touchscreen support works, but it is not great.  Work on this will continue.
@@ -165,6 +169,7 @@ keepInBoundsDragPullback            | number    | 0.7               | Constant t
 dragMouseButton                     | string    | 'left'            | Controls which mouse button drags the view.  Valid options are `left`, `middle`, and `right`.  *NOTE:* Using `middle` and `right` will disable the default 'auxclick' and 'contextmenu' handlers, respectively.  *ALSO NOTE:* Chrome seems to have a bug that doesn't the permit the 'mousemove' event to fire after middle-click drag until it receives a normal left 'click' event.  If anyone can shed any light on this, I'd be happy to hear from you.  It's such an edge case, though, that I won't be opening a bug report, but feel free to do so if this affects you. 
 noDragFromElementClass              | string    | null              | If set, this will prevent click-drag on elements who have a parent element containing a specific class name.
 acceleratePan                       | boolean   | true              | Controls whether the pan frame will be hardware accelerated.
+dynamicContentDimensions                       | boolean   | false              | If true, a ResizeObserver will be used to detect changes in the content dimensions.  Useful if the content dimensions can't be predicted.  Alternatively, the API methods `detectContentDimensions()` or `contentDimensionsChanged()` can also be used.  ResizeObservers may not work in some older or mobile web browsers.  See https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver for info on browser compatibility.
 
 ## API
 
@@ -176,9 +181,9 @@ The panzoom library provides an API for interacting with, observing, and control
 
   - `changeZoomLevel(newZoomLevel: number, clickPoint: Point)` - This method will reset the view to _newZoomLevel_, with _clickPoint_ as its centre point.
 
-  - `zoomIn()` - This will zoom the view in to the last zoomed point by one zoom level.
+  - `zoomIn(zoomType: 'lastPoint' | 'viewCenter' = 'lastPoint')` - This will zoom the view in to either the last zoomed point (if _lastPoint_), or to the centre point of the view (_viewCenter_), by one zoom level.  The default zoomType is `lastPoint`.
 
-  - `zoomOut()` - This will zoom the view out from the last zoomed point by one zoom level.
+   - `zoomOut(zoomType: 'lastPoint' | 'viewCenter' = 'lastPoint')` - This will zoom the view out from either the last zoomed point (if _lastPoint_), or from the centre point of the view (_viewCenter_), by one zoom level.  The default zoomType is `lastPoint`.
 
   - `zoomToFit(rectangle: Rect, [duration: number])` - Animates the view to focus on a rectangle of the underlying canvas.  **duration** is how long the animation should take (in seconds), and is optional.  **rectangle** is two coordinates on the canvas which the panZoom view is pan/zooming.  See the below section on PanZoom Interfaces for its definition.
  
@@ -209,6 +214,10 @@ The panzoom library provides an API for interacting with, observing, and control
   - `centerX([duration: number])` - Will centre the view on its X axis.
 
   - `centerY([duration: number])` - Will centre the view on its Y axis.
+
+  - `detectContentDimensions()` - Will trigger a one-time detection of the content dimensions.
+
+  - `updateContentDimensions([width: number], [height: number])` - Will update the content dimensions with the width and height values passed in.  Either parameter is optional.
 
 
 ## PanZoom API Interfaces:
