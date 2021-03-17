@@ -1,6 +1,6 @@
 {
   "name": "ngx-panzoom",
-  "version": "10.3.0",
+  "version": "10.3.1",
   "author": "Tim Underhay",
   "license": "MIT",
   "homepage": "https://github.com/kensingtontech/ngx-panzoom",
@@ -15,7 +15,8 @@
     "e2e": "ng e2e",
     "buildpack": "rm -rf dist/ && ng build --prod && cd dist/ngx-panzoom && npm pack .",
     "buildpublish": "rm -rf dist/ && ng build --prod && cd dist/ngx-panzoom && npm publish .",
-    "builddemotest": "VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ~/src/ngx-panzoom-demo && cd ~/src/ngx-panzoom-demo && npm install ngx-panzoom-${VER}.tgz"
+    "builddemotest": "VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ~/src/ngx-panzoom-demo && cd ~/src/ngx-panzoom-demo && npm install ngx-panzoom-${VER}.tgz",
+    "buildbugtest": "BUGDIR=\"../ng2-panzoom-test-100-era4cb\" && VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ${BUGDIR} && cd ${BUGDIR} && npm install ngx-panzoom-${VER}.tgz"
   },
   "private": false,
   "dependencies": {

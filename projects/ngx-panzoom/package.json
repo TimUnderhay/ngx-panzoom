@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/KensingtonTech/ngx-panzoom.git"
   },
-  "version": "10.3.0",
+  "version": "10.3.1",
   "peerDependencies": {
     "@angular/common": ">=2.0.0 < 11.0.0",
     "@angular/core": ">=2.0.0 < 11.0.0"
