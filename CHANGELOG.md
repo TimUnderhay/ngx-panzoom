@@ -1,5 +1,18 @@
 # Change Log
 
+# 12.0.0
+- Updated for Angular 12.x.x.
+
+### Changed
+- Compiled with partial Ivy compilation mode.
+
+# 11.x
+- Updated for Angular 11.x.x.
+
+### Fixed
+- Fix for config input being marked as private.
+- Improved single-touch pan handling (thanks to @dexterbt1).
+
 # 10.3.0
 
 ### Added
