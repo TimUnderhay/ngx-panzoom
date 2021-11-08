@@ -23,18 +23,6 @@
               "tsConfig": "projects/ngx-panzoom/tsconfig.lib.prod.json"
             }
           }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/ngx-panzoom/tsconfig.lib.json",
-              "projects/ngx-panzoom/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
         }
       }
     }
