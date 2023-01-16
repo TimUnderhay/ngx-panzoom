@@ -3,10 +3,10 @@
   "version": "15.0.0",
   "author": "Tim Underhay",
   "license": "MIT",
-  "homepage": "https://github.com/kensingtontech/ngx-panzoom",
+  "homepage": "https://github.com/TimUnderhay/ngx-panzoom",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KensingtonTech/ngx-panzoom.git"
+    "url": "https://github.com/TimUnderhay/ngx-panzoom.git"
   },
   "scripts": {
     "ng": "ng",
@@ -15,7 +15,7 @@
     "e2e": "ng e2e",
     "buildpack": "rm -rf dist/ && ng build --configuration production && cd dist/ngx-panzoom && npm pack .",
     "buildpublish": "rm -rf dist/ && ng build --configuration production && cd dist/ngx-panzoom && npm publish .",
-    "builddemotest": "VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ~/src/ngx-panzoom-demo && cd ~/src/ngx-panzoom-demo && npm install ngx-panzoom-${VER}.tgz"
+    "builddemotest": "VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ~/src/ngx-panzoom-demo && cd ~/src/ngx-panzoom-demo && pnpm add ./ngx-panzoom-${VER}.tgz"
   },
   "private": false,
   "dependencies": {
