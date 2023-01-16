@@ -12,7 +12,7 @@ Doubtless many will have noticed that there has been little by way of support fo
 
 ## Demo
 
-Click [here](https://kensingtontech.github.io/ngx-panzoom-demo) for a demo of the module.  The demo source can be found [here](https://github.com/KensingtonTech/ngx-panzoom-demo).
+Click [here](https://TimUnderhay.github.io/ngx-panzoom-demo) for a demo of the module.  The demo source can be found [here](https://github.com/TimUnderhay/ngx-panzoom-demo).
 
 ## Features
 
