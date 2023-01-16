@@ -1,5 +1,8 @@
 # Change Log
 
+# 15.0.0
+- Updated for Angular 15.x.x.
+
 # 14.0.0
 - Updated for Angular 14.x.x.
 
