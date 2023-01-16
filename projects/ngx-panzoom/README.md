@@ -2,7 +2,7 @@
 
 An Angular component for panning and zooming an element or elements using the mouse and mousewheel.  Provides rudimentary support for touchscreens (read section on mobile support).  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing in this undertaking.
 
-It is built using Angular CLI 13.x in partial Ivy compilation mode.  It is therefore no longer compatible with legacy Angular version which are still using the View Engine.  It is only tested with the corresponding version of Angular.
+It is built using Angular CLI 14.x in partial Ivy compilation mode.  It is therefore no longer compatible with legacy Angular version which are still using the View Engine.  It is only tested with the corresponding version of Angular.
 
 This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
 
@@ -18,6 +18,10 @@ Click [here](https://kensingtontech.github.io/ngx-panzoom-demo) for a demo of th
 
 - Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 - Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
+
+# Version 14.x Changes
+
+- Updated for Angular 14.x.
 
 # Version 13.x Changes
 

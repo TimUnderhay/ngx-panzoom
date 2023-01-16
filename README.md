@@ -19,6 +19,10 @@ Click [here](https://kensingtontech.github.io/ngx-panzoom-demo) for a demo of th
 - Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 - Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
 
+# Version 14.x Changes
+
+- Updated for Angular 14.x.
+
 # Version 13.x Changes
 
 - Updated for Angular 13.x.
