@@ -4,7 +4,10 @@
   "newProjectRoot": "projects",
   "cli": {
     "packageManager": "pnpm",
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   },
   "projects": {
     "ngx-panzoom": {
@@ -22,6 +25,48 @@
           "configurations": {
             "production": {
               "tsConfig": "projects/ngx-panzoom/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ngx-panzoom/**/*.ts",
+              "projects/ngx-panzoom/**/*.html"
+            ]
+          }
+        },
+        "cypress-run": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "ngx-panzoom:serve",
+            "configFile": "projects/ngx-panzoom/cypress.config.js"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ngx-panzoom:serve:production"
+            }
+          }
+        },
+        "cypress-open": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "watch": true,
+            "headless": false,
+            "configFile": "projects/ngx-panzoom/cypress.config.js"
+          }
+        },
+        "e2e": {
+          "builder": "@cypress/schematic:cypress",
+          "options": {
+            "devServerTarget": "ngx-panzoom:serve",
+            "watch": true,
+            "headless": false
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ngx-panzoom:serve:production"
             }
           }
         }

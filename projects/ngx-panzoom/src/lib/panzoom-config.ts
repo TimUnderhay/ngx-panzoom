@@ -1,8 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { Rect } from './types/rect';
-import { PanZoomModel } from './panzoom-model';
-import { PanZoomAPI } from './panzoom-api';
-import { PanZoomConfigOptions } from './types/panzoom-config-options';
+import { Rect, PanZoomAPI, PanZoomConfigOptions, PanZoomModel } from './types';
 
 export class PanZoomConfig {
   zoomLevels = 5;

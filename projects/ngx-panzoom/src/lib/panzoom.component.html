@@ -1,22 +1,10 @@
 <div
-  #frameElement
-  class="pan-zoom-frame">
-
-    <div
-      #panElement
-      class="pan-element">
-
-        <div
-          #zoomElement
-          class="zoom-element">
-
-            <ng-content></ng-content>
-
-        </div>
-
-    </div>
-
+  #zoomElement
+  class="zoom-element">
+    <div #trackElement></div>
+    <ng-content></ng-content>
 </div>
+
 
 <div
   #panzoomOverlay
