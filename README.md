@@ -22,6 +22,7 @@ Click [here](https://TimUnderhay.github.io/ngx-panzoom-demo) for a demo of the m
 # Version 16.x Changes
 
 - Updated for Angular 16.x.
+- Converted to standalone component.
 
 # Version 15.x Changes
 
