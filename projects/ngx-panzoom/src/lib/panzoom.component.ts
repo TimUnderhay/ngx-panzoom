@@ -25,14 +25,15 @@ interface Position {
 
 
 
-@Component( {
-  selector: 'pan-zoom',
-  // we don't want to kill change detection for all elements beneath this, so we don't set OnPush.  Child views can implement OnPush if the developer wants to.  We can get away with this because the 'wheel' event handler runs outside of Angular, therefore it doesnt trigger change detection.
-  templateUrl: './panzoom.component.html',
-  styleUrls: [
-    './panzoom.component.css'
-  ]
-} )
+@Component({
+    selector: 'pan-zoom',
+    // we don't want to kill change detection for all elements beneath this, so we don't set OnPush.  Child views can implement OnPush if the developer wants to.  We can get away with this because the 'wheel' event handler runs outside of Angular, therefore it doesnt trigger change detection.
+    templateUrl: './panzoom.component.html',
+    styleUrls: [
+        './panzoom.component.css'
+    ],
+    standalone: true
+})
 
 
 
