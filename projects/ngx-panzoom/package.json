@@ -2,15 +2,15 @@
   "name": "ngx-panzoom",
   "author": "Tim Underhay",
   "license": "MIT",
-  "homepage": "https://github.com/kensingtontech/ngx-panzoom",
+  "homepage": "https://github.com/timunderhay/ngx-panzoom",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KensingtonTech/ngx-panzoom.git"
+    "url": "https://github.com/timunderhay/ngx-panzoom.git"
   },
-  "version": "17.0.0",
+  "version": "17.2.0-next.1",
   "peerDependencies": {
-    "@angular/common": ">=17.0.0 < 18.0.0",
-    "@angular/core": ">=17.0.0 < 18.0.0"
+    "@angular/common": ">=17.2.0 < 18.0.0",
+    "@angular/core": ">=17.2.0 < 18.0.0"
   },
   "dependencies": {
     "tslib": "^2.0.0"

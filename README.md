@@ -1,10 +1,10 @@
 # ngx-panzoom
 
-An Angular component for panning and zooming an element or elements using the mouse and mousewheel.  Provides rudimentary support for touchscreens (read section on mobile support).  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing in this undertaking.
+An Angular component for panning and zooming an element or elements using the mouse and mousewheel.  Provides rudimentary support for touchscreens (read section on mobile support).  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing.
 
-It is built using Angular CLI 13.x in partial Ivy compilation mode.  It is therefore no longer compatible with legacy Angular version which are still using the View Engine.  It is only tested with the corresponding version of Angular.
+It is built using Angular CLI.  It is only tested with the corresponding version of Angular.
 
-This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
+This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that performance will be maximised.
 
 ## This Module is on Life Support -- New Maintainer Needed!
 
@@ -84,8 +84,8 @@ Version 10.x is compiled using Angular 10.x.  Per the Angular guidance at the ti
 - The `zoomIn()` and `zoomOut()` API functions can zoom to either the last zoomed point rather or to the view's centre point, depending on the value of `zoomType` (`lastPoint` or `viewCenter`).
 - New API methods `panToPoint()`, `panDelta()`, `panDeltaPercent()`,  `panDeltaAbsolute()`, and many others have been added.
 - Many performance improvements.
-- The widget has not been migrated from the original project, though this probably shouldn't be hard to do.  Pull requests are welcome!
-- Touchscreen support works, but it is not great.  Work on this will continue.
+- The widget has not been migrated from the original project.
+- Touchscreen support "works", but doesn't work well.  Work on this will continue.
 
 ## Dependencies
 - Angular

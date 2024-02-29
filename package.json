@@ -1,6 +1,6 @@
 {
   "name": "ngx-panzoom",
-  "version": "17.0.0",
+  "version": "17.2.0-next.1",
   "author": "Tim Underhay",
   "license": "MIT",
   "homepage": "https://github.com/TimUnderhay/ngx-panzoom",
@@ -11,10 +11,11 @@
   "scripts": {
     "ng": "ng",
     "build": "ng build --configuration production",
+    "postbuild": "cp README.md dist/",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "buildpack": "rm -rf dist/ && ng build --configuration production && cd dist/ngx-panzoom && npm pack .",
-    "buildpublish": "rm -rf dist/ && ng build --configuration production && cd dist/ngx-panzoom && npm publish .",
+    "buildpack": "npm run build && cd dist && npm pack .",
+    "buildpublish": "npm run build && cd dist && npm publish .",
     "builddemotest": "VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ~/src/ngx-panzoom-demo && cd ~/src/ngx-panzoom-demo && pnpm add ./ngx-panzoom-${VER}.tgz"
   },
   "private": false,
@@ -25,13 +26,12 @@
     "@angular/platform-browser": "^17.0.4",
     "@angular/platform-browser-dynamic": "^17.0.4",
     "ng-packagr": "^17.0.2",
-    "rxjs": "^7.8.1",
     "tslib": "^2.3.1",
     "zone.js": "~0.14.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~17.0.3",
-    "@angular/cli": "~17.0.3",
+    "@angular-devkit/build-angular": "~17.2.2",
+    "@angular/cli": "~17.2.2",
     "@angular/compiler-cli": "^17.0.4",
     "@angular/language-service": "^17.0.4",
     "@types/jasmine": "~3.8.2",
@@ -44,6 +44,6 @@
     "karma-jasmine-html-reporter": "^2.1.0",
     "ts-node": "~10.9.1",
     "tslint": "~6.1.3",
-    "typescript": "~5.2.2"
+    "typescript": "~5.3.3"
   }
 }
