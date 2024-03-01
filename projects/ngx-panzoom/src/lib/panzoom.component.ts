@@ -4,7 +4,6 @@ import {
   AfterViewInit,
   OnDestroy,
   ElementRef,
-  ViewChild,
   viewChild,
   NgZone,
   model,

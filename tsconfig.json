@@ -27,7 +27,9 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "strict": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "useDefineForClassFields": false
+    
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

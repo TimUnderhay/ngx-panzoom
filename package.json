@@ -11,12 +11,15 @@
   "scripts": {
     "ng": "ng",
     "build": "ng build --configuration production",
+    "builddemo": "ng build --configuration production demo-app",
+    "start": "ng serve",
     "postbuild": "cp README.md dist/",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "buildpack": "npm run build && cd dist && npm pack .",
     "buildpublish": "npm run build && cd dist && npm publish .",
-    "builddemotest": "VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ~/src/ngx-panzoom-demo && cd ~/src/ngx-panzoom-demo && pnpm add ./ngx-panzoom-${VER}.tgz"
+    "builddemotest": "VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ~/src/ngx-panzoom-demo && cd ~/src/ngx-panzoom-demo && pnpm add ./ngx-panzoom-${VER}.tgz",
+    "buildpages": "ng deploy --base-href \"/ngx-panzoom/\""
   },
   "private": false,
   "dependencies": {
@@ -25,7 +28,13 @@
     "@angular/core": "^17.0.4",
     "@angular/platform-browser": "^17.0.4",
     "@angular/platform-browser-dynamic": "^17.0.4",
+    "angular-cli-ghpages": "^2.0.0-beta.2",
+    "font-awesome": "^4.7.0",
     "ng-packagr": "^17.0.2",
+    "primeflex": "^3.3.1",
+    "primeng": "^17.9.0",
+    "rxjs": "~7.8.1",
+    "screenfull": "^6.0.2",
     "tslib": "^2.3.1",
     "zone.js": "~0.14.2"
   },
