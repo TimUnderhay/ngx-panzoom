@@ -29,7 +29,6 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "useDefineForClassFields": false
-    
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
