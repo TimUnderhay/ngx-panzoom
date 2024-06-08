@@ -1,4 +1,4 @@
-<pan-zoom
+<ngx-panzoom
   #PanZoom
   [zoomLevels]="10"
   [scalePerZoomLevel]="scalePerZoomLevel()"
@@ -6,7 +6,7 @@
   [freeMouseWheelFactor]="0.01"
   [zoomToFitZoomLevelFactor]="0.9"
   [neutralZoomLevel]="neutralZoomLevel()"
-  [(model)]="panzoomModel"
+  (modelChange)="panzoomModel.set($event)"
   [initialZoomToFit]="initialZoomToFit()"
 >
   <div
@@ -18,7 +18,7 @@
       <app-tile [content]="item"></app-tile>
     }
   </div>
-</pan-zoom>
+</ngx-panzoom>
 
 <div class="controls-container flex flex-column justify-content-between">
 

@@ -24,7 +24,6 @@
         "./dist"
       ]
     },
-    "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "strict": true,
     "strictPropertyInitialization": false,

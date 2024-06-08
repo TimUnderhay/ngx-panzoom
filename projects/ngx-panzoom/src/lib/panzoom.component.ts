@@ -8,7 +8,8 @@ import {
   NgZone,
   model,
   effect,
-  input
+  input,
+  output
 } from '@angular/core';
 import {
   getIsMouseEvent,
@@ -32,7 +33,7 @@ import {
 } from './types';
 
 @Component({
-    selector: 'pan-zoom, ngx-pan-zoom',
+    selector: 'pan-zoom, ngx-pan-zoom, ngx-panzoom',
     // we don't want to kill change detection for all elements beneath this, so we don't set OnPush.  Child views can implement OnPush if the developer wants to.  We can get away with this because the 'wheel' event handler runs outside of Angular, therefore it doesnt trigger change detection.
     templateUrl: './panzoom.component.html',
     styleUrls: ['./panzoom.component.css'],
@@ -40,11 +41,6 @@ import {
 })
 export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy, PanZoomConfigSignalOptions {
   constructor (private zone: NgZone) {}
-
-  // @ViewChild('frameElement', { static: true }) private frameElementRef: ElementRef;
-  // @ViewChild('panElement', { static: true }) private panElementRef: ElementRef;
-  // @ViewChild('zoomElement', { static: true }) private zoomElementRef: ElementRef;
-  // @ViewChild('panzoomOverlay', { static: true }) private panzoomOverlayRef: ElementRef;
   
   private readonly frameElementRef = viewChild.required<ElementRef>('frameElement');
   private readonly panElementRef = viewChild.required<ElementRef>('panElement');
@@ -117,7 +113,18 @@ export class PanZoomComponent implements OnInit, AfterViewInit, OnDestroy, PanZo
 
 
   ngOnInit(): void {
-    const { keepInBounds, acceleratePan, freeMouseWheel, zoomLevels, initialZoomLevel, neutralZoomLevel, dragMouseButton, initialZoomToFit, initialPanX, initialPanY } = this;
+    const {
+      keepInBounds,
+      acceleratePan,
+      freeMouseWheel,
+      zoomLevels,
+      initialZoomLevel,
+      neutralZoomLevel,
+      dragMouseButton,
+      initialZoomToFit,
+      initialPanX,
+      initialPanY
+    } = this;
     this.base = initialZoomToFit()
       ? this.calcZoomToFit(initialZoomToFit()!)
       : {
