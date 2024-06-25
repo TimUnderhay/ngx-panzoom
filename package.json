@@ -1,6 +1,6 @@
 {
   "name": "ngx-panzoom",
-  "version": "17.0.0",
+  "version": "18.0.0",
   "author": "Tim Underhay",
   "license": "MIT",
   "homepage": "https://github.com/TimUnderhay/ngx-panzoom",
@@ -19,21 +19,21 @@
   },
   "private": false,
   "dependencies": {
-    "@angular/common": "^17.0.4",
-    "@angular/compiler": "^17.0.4",
-    "@angular/core": "^17.0.4",
-    "@angular/platform-browser": "^17.0.4",
-    "@angular/platform-browser-dynamic": "^17.0.4",
-    "ng-packagr": "^17.0.2",
+    "@angular/common": "^18.0.4",
+    "@angular/compiler": "^18.0.4",
+    "@angular/core": "^18.0.4",
+    "@angular/platform-browser": "^18.0.4",
+    "@angular/platform-browser-dynamic": "^18.0.4",
+    "ng-packagr": "^18.0.0",
     "rxjs": "^7.8.1",
     "tslib": "^2.3.1",
     "zone.js": "~0.14.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~17.0.3",
-    "@angular/cli": "~17.0.3",
-    "@angular/compiler-cli": "^17.0.4",
-    "@angular/language-service": "^17.0.4",
+    "@angular-devkit/build-angular": "~18.0.5",
+    "@angular/cli": "~18.0.5",
+    "@angular/compiler-cli": "^18.0.4",
+    "@angular/language-service": "^18.0.4",
     "@types/jasmine": "~3.8.2",
     "codelyzer": "^6.0.2",
     "jasmine-core": "~4.3.0",
@@ -44,6 +44,6 @@
     "karma-jasmine-html-reporter": "^2.1.0",
     "ts-node": "~10.9.1",
     "tslint": "~6.1.3",
-    "typescript": "~5.2.2"
+    "typescript": "~5.4.5"
   }
 }
