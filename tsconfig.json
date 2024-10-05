@@ -20,9 +20,7 @@
       "dom"
     ],
     "paths": {
-      "ngx-panzoom": [
-        "./dist"
-      ]
+      "ngx-panzoom": ["./projects/ngx-panzoom/src/public-api"]
     },
     "noImplicitAny": true,
     "strict": true,

@@ -6,23 +6,23 @@ It is built using Angular CLI.  It is only tested with the corresponding version
 
 This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that performance will be maximised.
 
-# Version 18 Breaking Changes
+# End Of Life
+There are no plans to support ngx-panzoom beyond version 19.  PR's may still be accepted, though.
+
+## Version 19 Compatibility
+Version 19 is compatible with Angular 18 and up.  Assuming Angular's API doesn't significantly change in future releases, this library should continue to function.
+
+## Version 19 Breaking Changes
 
 - The `PanZoomConfig` class has been removed.  Configuration options which were previously set using `PanZoomConfig` should now be bound directly to `ngx-panzoom` in the template.
-- Version 18 adopts a more conventional API approach -- it removes the need to access the API via an observable (this interface has been fully removed).  One need only use `viewChild` or `@ViewChild` with a PanZoomComponent selector, or a `#Hash` selector in the template.
+- Version 19 adopts a more conventional API approach -- it removes the need to access the API via an observable (this interface has been fully removed).  One need only use `viewChild` or `@ViewChild` with a PanZoomComponent selector, or a `#Hash` selector in the template.
 - The `modelChanged` RxJS BehaviorSubject of the `PanZoomConfig` class has been replaced with a standard `modelChange` Angular output.
 
 See code example for more details.
 
-## Limited Support -- New Maintainer Needed
-
-This module is receiving only version updates at this time -- exceptions will be considered for any new issue introduced with the V18 breaking API changes.  For all other issues, only pull requests will be accepted, or I can consider an ad hoc support contract.  I can be contacted at https://www.linkedin.com/in/timunderhay
-
-If you would like to take over as maintainer, please contact me directly on LinkedIn.
-
 ## Demo
 
-As of version 18, the demo app is part of this repository, under `projects/demo-app`.  Click [here](https://TimUnderhay.github.io/ngx-panzoom)
+As of version 19, the demo app is part of this repository, under `projects/demo-app`.  Click [here](https://TimUnderhay.github.io/ngx-panzoom)
 
 
 ## Features
@@ -30,7 +30,7 @@ As of version 18, the demo app is part of this repository, under `projects/demo-
 - Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 - Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
 
-# Differences From the Original
+# Differences From the Original AngularJS Version
 
 - The pan-zoom service has been eliminated.
 - **Free zoom** - zooming is no longer limited to switching between two distinct zoom levels.  Zoom can now be smoothly and freely controlled using the mouse wheel or trackpad.
@@ -43,11 +43,9 @@ As of version 18, the demo app is part of this repository, under `projects/demo-
 - Touchscreen support "works", but not well.
 
 ## Dependencies
-- Angular
+- >= Angular 18
 
 ## Mobile Support -- Actively Soliciting PR's
-
-I am actively soliciting pull requests for mobile support.  Read on.
 
 The library implements some basic support that may work with some mobile devices, though pinch-to-zoom still needs considerable work.  As the application that this library was developed for was never intended for use with mobile devices, there are no plans to implement full mobile support.  As long as this remains the case, I respecfully ask for no more issues concerning mobile support, please.  I realise that this will limit adoption, but for an enterprising developer out there, I can't imagine that adding mobile support would be nearly as big of a challenge as it was to port the library to Angular from AngularJS!
 

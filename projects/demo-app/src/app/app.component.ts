@@ -13,7 +13,7 @@ import {
 import {
   PanZoomComponent,
   PanZoomModel
-} from '../../../ngx-panzoom/src/public-api';
+} from 'ngx-panzoom';
 import { contentItems } from './contentItems';
 import { RounderPipe } from './rounder.pipe';
 import { TooltipModule } from 'primeng/tooltip';
