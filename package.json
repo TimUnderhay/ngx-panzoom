@@ -17,9 +17,6 @@
     "start": "ng serve",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "buildpack": "npm run build && cd dist && npm pack .",
-    "buildpublish": "npm run build && cd dist && npm publish .",
-    "builddemotest": "VER=`grep version projects/ngx-panzoom/package.json | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'` && npm run buildpack && cp dist/ngx-panzoom/ngx-panzoom-*.tgz ~/src/ngx-panzoom-demo && cd ~/src/ngx-panzoom-demo && pnpm add ./ngx-panzoom-${VER}.tgz",
     "buildpages": "ng deploy --base-href \"/ngx-panzoom/\""
   },
   "private": false,
@@ -29,7 +26,7 @@
     "@angular/core": "^18.0.0",
     "@angular/platform-browser": "^18.0.0",
     "@angular/platform-browser-dynamic": "^18.0.0",
-    "angular-cli-ghpages": "^2.0.0-beta.2",
+    "angular-cli-ghpages": "^2.0.1",
     "font-awesome": "^4.7.0",
     "ng-packagr": "^18.0.0",
     "primeflex": "^3.3.1",
