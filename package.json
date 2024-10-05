@@ -17,7 +17,7 @@
     "start": "ng serve",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "buildpages": "ng deploy --base-href \"/ngx-panzoom/\""
+    "buildpages": "ng deploy --base-href \"/ngx-panzoom/\" --repo https://github.com/TimUnderhay/ngx-panzoom"
   },
   "private": false,
   "dependencies": {
