@@ -1,0 +1,265 @@
+<ngx-panzoom
+  #PanZoom
+  [zoomLevels]="10"
+  [scalePerZoomLevel]="scalePerZoomLevel()"
+  [zoomStepDuration]="0.2"
+  [freeMouseWheelFactor]="0.01"
+  [zoomToFitZoomLevelFactor]="0.9"
+  [neutralZoomLevel]="neutralZoomLevel()"
+  (modelChange)="panzoomModel.set($event)"
+  [initialZoomToFit]="initialZoomToFit()"
+>
+  <div
+    class="bg noselect items"
+    style="position: relative;"
+    [style.width.px]="canvasWidth()"
+  >
+    @for (item of contentItems; track item.id) {
+      <app-tile [content]="item"></app-tile>
+    }
+  </div>
+</ngx-panzoom>
+
+<div class="controls-container flex flex-column justify-content-between">
+
+  <!-- Controls -->
+  <div class="noselect button-box p-2 flex flex-column flex-grow-0 flex-shrink-1 gap-2 w-full">
+
+    <!-- Top button row -->
+    <div class="flex justify-content-center gap-2">
+
+      <div
+        toggleFullscreen
+        class="control-icon fa-desktop"
+        pTooltip="Toggle full screen"
+        [showDelay]="500">
+      </div>
+
+      <div
+        (click)="PanZoom.resetView()"
+        class="control-icon fa-home"
+        [pTooltip]="'Reset view to initial state:\n\npanZoomComponent.resetView()'"
+        [showDelay]="500">
+      </div>
+
+      <div
+        (click)="PanZoom.zoomOut('viewCenter');"
+        class="control-icon fa-search-minus"
+        [pTooltip]="'Zoom out one zoomLevel:\n\npanZoomComponent.zoomOut(\'viewCenter\')'"
+        [showDelay]="500">
+      </div>
+
+      <div
+        (click)="PanZoom.zoomIn('viewCenter')"
+        class="control-icon fa-search-plus"
+        [pTooltip]="'Zoom in one zoomLevel:\n\npanZoomComponent.zoomIn(\'viewCenter\')'"
+        [showDelay]="500">
+      </div>
+
+      <div
+        (click)="PanZoom.panToPoint( { x: 2400, y: 4270 } )"
+        class="control-icon fa-bullseye"
+        [pTooltip]="'Pan to a point. In this case, the lower right-hand-corner:\n\npanZoomComponent.panToPoint( { x: 2400, y: 4270 } )'"
+        [showDelay]="500">
+      </div>
+
+    </div>
+
+    <!-- Middle button row -->
+    <div class="flex justify-content-center gap-2">
+
+        <div
+          (click)="PanZoom.centerContent()"
+          class="control-icon fa-align-center"
+          [pTooltip]="'Pan to the centre of the content\n\npanZoomComponent.centerContent()'"
+          [showDelay]="500">
+        </div>
+
+        <div
+          (click)="PanZoom.centerTopLeft()"
+          class="control-icon"
+          [pTooltip]="'Pan to the bottom-left corner of the content:\n\npanZoomComponent.centerBottomLeft()'"
+          [showDelay]="500">
+
+          <div class="fa fa-arrow-left rotate-45">
+          </div>
+
+        </div>
+
+        <div
+          (click)="PanZoom.centerTopRight()"
+          class="control-icon"
+          [pTooltip]="'Pan to the top-left corner of the content\n\npanZoomComponent.centerTopLeft()'"
+          [showDelay]="500">
+
+            <span class="fa fa-arrow-up rotate-45">
+            </span>
+
+        </div>
+
+        <div
+          (click)="PanZoom.centerBottomLeft()"
+          class="control-icon"
+          [pTooltip]="'Pan to the top-right corner of the content:\n\npanZoomComponent.centerTopRight()'"
+          [showDelay]="500">
+
+          <div class="fa fa-arrow-down rotate-45">
+          </div>
+
+        </div>
+
+        <div
+          (click)="PanZoom.centerBottomRight()"
+          class="icon fa-2x fa-fw"
+          [pTooltip]="'Pan to the bottom-right corner of the content:\n\npanZoomComponent.centerBottomRight()'"
+          [showDelay]="500">
+
+          <div class="fa fa-arrow-right rotate-45">
+          </div>
+
+        </div>
+
+    </div>
+
+    <!-- Lower button row -->
+    <div class="flex justify-content-center gap-2">
+
+      <div
+        (click)="PanZoom.centerX()"
+        class="control-icon letter-icon"
+        [pTooltip]="'Pan to the centre of the X axis\n\npanZoomComponent.centerX()'"
+        [showDelay]="500">
+          X
+      </div>
+
+      <div
+        (click)="PanZoom.centerY()"
+        class="control-icon"
+        [pTooltip]="'Pan to the centre of the Y axis\n\npanZoomComponent.centerY()'"
+        [showDelay]="500">
+          Y
+      </div>
+
+      <div class="control-icon v-hidden">
+          Y
+      </div>
+      <div class="control-icon v-hidden">
+          Y
+      </div>
+      <div class="control-icon v-hidden">
+          Y
+      </div>
+    
+    </div>
+
+    <!-- panDelta() buttons -->
+    <div class="d-pad-row">
+
+      <div>
+
+        <div
+          class="d-pad-text"
+          style="position: absolute; left: 80px; top: 0; width: 100px;">
+            100px
+        </div>
+
+        <div
+          style="position: absolute; left: 0; top: 20px"
+          (click)="onPanLeft100Clicked()"
+          class="control-icon fa-arrow-left"
+          [pTooltip]="'Pan left by 100 pixels:\n\npanZoomComponent.panDelta( { x: -100, y: 0 } )'"
+          [showDelay]="500">
+        </div>
+
+        <div
+          style="position: absolute; left: 40px;"
+          (click)="onPanUp100Clicked()"
+          class="control-icon fa-arrow-up"
+          [pTooltip]="'Pan up by 100 pixels:\n\npanZoomComponent.panDelta( { x: 0, y: -100 } )'"
+          [showDelay]="500">
+        </div>
+
+        <div
+          style="position: absolute; left: 80px; top: 20px"
+          class="control-icon fa-arrow-right"
+          (click)="onPanRight100Clicked()"
+          [pTooltip]="'Pan right by 100 pixels:\n\npanZoomComponent.panDelta( { x: 100, y: 0 } )'"
+          [showDelay]="500">
+        </div>
+
+        <div
+          style="position: absolute; left: 40px; top: 40px"
+          (click)="onPanDown100Clicked()"
+          class="control-icon fa-arrow-down"
+          [pTooltip]="'Pan down by 100 pixels:\n\npanZoomComponent.panDelta( { x: 0, y: 100 } )'"
+          [showDelay]="500">
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- panDeltaPercent() buttons -->
+    <div class="d-pad-row">
+
+        <div>
+
+          <div
+            class="d-pad-text"
+            style="position: absolute; left: 85px; top: 0; width: 100px;">
+              20%
+          </div>
+  
+          <div
+            style="position: absolute; left: 0; top: 20px"
+            (click)="onPanLeftPercentClicked()"
+            class="control-icon fa-arrow-left"
+            [pTooltip]="'Pan left by 20 per cent:\n\npanZoomComponent.panDeltaPercent( { x: -20, y: 0 } )'"
+            [showDelay]="500">
+          </div>
+
+          <div
+            style="position: absolute; left: 40px;"
+            (click)="onPanUpPercentClicked()"
+            class="control-icon fa-arrow-up"
+            [pTooltip]="'Pan up by 20 per cent:\n\npanZoomComponent.panDeltaPercent( { x: 0, y: -20 } )'"
+            [showDelay]="500">
+          </div>
+  
+          <div
+            style="position: absolute; left: 80px; top: 20px"
+            (click)="onPanRightPercentClicked()"
+            class="control-icon fa-arrow-right"
+            [pTooltip]="'Pan right by 20 per cent:\n\npanZoomComponent.panDeltaPercent( { x: 20, y: 0 } )'"
+            [showDelay]="500">
+          </div>
+
+          <div
+            style="position: absolute; left: 40px; top: 40px"
+            (click)="onPanDownPercentClicked()"
+            class="control-icon fa-arrow-down"
+            [pTooltip]="'Pan down by 20 per cent:\n\npanZoomComponent.panDeltaPercent( { x: 0, y: 20 } )'"
+            [showDelay]="500">
+          </div>
+
+        </div>
+    </div>
+
+  </div>
+
+
+  <!-- PanZoomModel Box -->
+  <div class="noselect panzoom-model-box">
+    <h3 class="mt-0">
+      PanZoom.model
+    </h3>
+    <div>
+      <strong>pan.x:</strong> {{panzoomModel().pan.x | rounder:0}}<br>
+      <strong>pan.y:</strong> {{panzoomModel().pan.y | rounder:0}}<br>
+      <strong>zoomLevel:</strong> {{panzoomModel().zoomLevel | rounder:3}}<br>
+      <strong>isPanning:</strong> {{panzoomModel().isPanning}}<br>
+      ------------------------------<br>
+      Calculated Scale: {{scale() | rounder:4 }}
+    </div>
+  </div>
+</div>

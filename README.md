@@ -1,102 +1,51 @@
 # ngx-panzoom
 
-An Angular component for panning and zooming an element or elements using the mouse and mousewheel.  Provides rudimentary support for touchscreens (read section on mobile support).  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing in this undertaking.
+An Angular component for panning and zooming an element or elements using the mouse and mousewheel.  Provides rudimentary support for touchscreens (read section on mobile support).  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing.
 
-It is built using Angular CLI 13.x in partial Ivy compilation mode.  It is therefore no longer compatible with legacy Angular version which are still using the View Engine.  It is only tested with the corresponding version of Angular.
+It is built using Angular CLI.  It is only tested with the corresponding version of Angular.
 
-This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that compatibility and performance will be maximised.
+This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that performance will be maximised.
 
-## This Module is on Life Support -- New Maintainer Needed!
+# End Of Life
+There are no plans to support ngx-panzoom beyond version 19.  PR's may still be accepted, though.
 
-Doubtless many will have noticed that there has been little by way of support for this library as of late.  Sadly, other life priorities just don't allow the time for it, and that doesn't seem likely to change in the near future.  If there is some brave soul out there would like to take over the maintenance of this module, please do contact me and I'll be happy to discuss it with you.
+## Version 19 Compatibility
+Version 19 is compatible with Angular 18 and up.  Assuming Angular's API doesn't significantly change in future releases, this library should continue to function.
+
+## Version 19 Breaking Changes
+
+- The `PanZoomConfig` class has been removed.  Configuration options which were previously set using `PanZoomConfig` should now be bound directly to `ngx-panzoom` in the template.
+- Version 19 adopts a more conventional API approach -- it removes the need to access the API via an observable (this interface has been fully removed).  One need only use `viewChild` or `@ViewChild` with a PanZoomComponent selector, or a `#Hash` selector in the template.
+- The `modelChanged` RxJS BehaviorSubject of the `PanZoomConfig` class has been replaced with a standard `modelChange` Angular output.
+
+See code example for more details.
 
 ## Demo
 
-Click [here](https://TimUnderhay.github.io/ngx-panzoom-demo) for a demo of the module.  The demo source can be found [here](https://github.com/TimUnderhay/ngx-panzoom-demo).
+As of version 19, the demo app is part of this repository, under `projects/demo-app`.  Click [here](https://TimUnderhay.github.io/ngx-panzoom)
+
 
 ## Features
 
 - Zoom using mouse wheel, touch surface, double click, or API controls tied to your own UI.
 - Pan using click/touch and drag, or API calls. When releasing the mouse button or touch surface whilst panning, the pan will come to a gradual stop.
 
-# Version 18.x Changes
-
-- Updated for Angular 18.x.
-
-# Version 17.x Changes
-
-- Updated for Angular 17.x.
-
-# Version 16.x Changes
-
-- Updated for Angular 16.x.
-- Converted to standalone component.
-
-# Version 15.x Changes
-
-- Updated for Angular 15.x.
-
-# Version 14.x Changes
-
-- Updated for Angular 14.x.
-
-# Version 13.x Changes
-
-- Updated for Angular 13.x.
-
-# Version 12.x Changes
-
-- Updated for Angular 12.x.
-
-## Version 12 Potentially Breaking Changes
-
-- Compiled in Ivy partial compilation mode. 
-- No longer supports previous Angular major versions. 
-
-
-# Version 11.x Changes
-
-- Updated for Angular 11.x.
-- Improved single-touch pan handling (thanks to @dexterbt1).
-- Fix for config input being marked as private.
-
-# Version 10.x Changes
-
-Version 10.x is compiled using Angular 10.x.  Per the Angular guidance at the time of writing (`https://angular.io/guide/creating-libraries`), Ivy is not used for the NPM repo build.  The following changes have been made:
-
-- The jQuery dependency has finally been removed!
-- Updated for and compiled with Angular 10.x.
-- New API helper methods `centerContent()`, `centerTopLeft()`, `centerBottomLeft()`, `centerTopRight()`, `centerBottomRight()`, `centerX()`, and `centerY()`
-- Config option `dynamicContentDimensions`, and new API methods `detectContentDimensions()` and `updateContentDimensions()` for when the content size isn't predictable.
-- Added options `lastPoint` (default for backwards-compatibility) and `viewCenter` to `zoomIn()` and `zoomOut()` API methods.  Defines which point to zoom to/from: either the centre of the screen or the last point zoomed to/from.
-- Added proper TypeScript definitions for API methods.
-- Several bug fixes.
-
-## Version 10 Potentially Breaking Changes
-
-- Renamed Ng2PanZoomModule to NgxPanZoomModule.
-- Renamed class panElement to pan-element.
-- Renamed class zoomElement to zoom-element.
-- Renamed class panzoomOverlay to pan-zoom-overlay.
-
-# Differences From the Original
+# Differences From the Original AngularJS Version
 
 - The pan-zoom service has been eliminated.
 - **Free zoom** - zooming is no longer limited to switching between two distinct zoom levels.  Zoom can now be smoothly and freely controlled using the mouse wheel or trackpad.
 - `zoomToFit()` animation - using the zoomToFit() function now will animate the view to the a desired rectangle.
 - A convenience method `resetView()` has been provided to animate the view back to its initial settings.
-- The `zoomIn()` and `zoomOut()` API functions can zoom to either the last zoomed point rather or to the view's centre point, depending on the value of `zoomType` (`lastPoint` or `viewCenter`).
+- The `zoomIn()` and `zoomOut()` API functions can zoom to either the last zoomed point or to the view's centre point, depending on the value of `zoomType` (`lastPoint` or `viewCenter`).
 - New API methods `panToPoint()`, `panDelta()`, `panDeltaPercent()`,  `panDeltaAbsolute()`, and many others have been added.
-- Many performance improvements.
-- The widget has not been migrated from the original project, though this probably shouldn't be hard to do.  Pull requests are welcome!
-- Touchscreen support works, but it is not great.  Work on this will continue.
+- Performance improvements.
+- The widget has not been migrated from the original project.
+- Touchscreen support "works", but not well.
 
 ## Dependencies
-- Angular
+- >= Angular 18
 
 ## Mobile Support -- Actively Soliciting PR's
-
-I am actively soliciting pull requests for mobile support.  Read on.
 
 The library implements some basic support that may work with some mobile devices, though pinch-to-zoom still needs considerable work.  As the application that this library was developed for was never intended for use with mobile devices, there are no plans to implement full mobile support.  As long as this remains the case, I respecfully ask for no more issues concerning mobile support, please.  I realise that this will limit adoption, but for an enterprising developer out there, I can't imagine that adding mobile support would be nearly as big of a challenge as it was to port the library to Angular from AngularJS!
 
@@ -115,8 +64,8 @@ import { NgxPanZoomModule } from 'ngx-panzoom';
 
 @NgModule({
   imports: [  ...,
-              NgxPanZoomModule
-           ],
+    NgxPanZoomModule
+  ],
   ...
 })
 
@@ -125,67 +74,73 @@ export class MyAppModule { }
 
 ## Usage
 
-This library exposes a component called 'pan-zoom', under which you may place any standard Angular template code.  Though the events which trigger panning and zooming are run outside of Angular and thus themselves will not trigger change detection, it should not break change detection for any sub-components.
+This library exposes a component called `ngx-panzoom`, under which you may place any standard Angular template code.  Though the events which trigger panning and zooming are run outside of Angular and thus themselves will not trigger change detection, it should not break change detection for any sub-components.
 
-A configuration object is required, which gets passed in using `[config]="myConfig"`.
+Configuration parameters are set as properties of the `ngx-panzoom` template element.
 
-It also exposes an API which can be used to interact with the pan/zoom view.  The API is obtained through the configuration object (more below).
+The API can be accessed directly on the `PanZoomComponent` class, which can be obtained either as a template reference (i.e. `#PanZoom`) or using `viewChild` or `@ViewChild`.  See below example code.
 
 ### Top Tip
 
 Be sure to place your pan-zoom component underneath an element with a definite height/width, like an absolute-positioned div.  You may not see anything if you don't do this.
 
+## Example
+
 ```typescript
-import { PanZoomConfig, PanZoomAPI, PanZoomModel, PanZoomConfigOptions } from 'ngx-panzoom';
+import { viewChild, signal } from '@angular/core';
+import { PanZoomComponent, PanZoomModel } from 'ngx-panzoom';
 
 @Component({
   selector: 'my-component'
   template: `
-
     <div style="position: absolute; top: 100px; bottom: 0; left: 0; right: 0;">
-
-      <pan-zoom [config]="panZoomConfig">
-
+      <ngx-panzoom
+        #PanZoom
+        [zoomLevels]="10"
+        [scalePerZoomLevel]="scalePerZoomLevel()"
+        [zoomStepDuration]="0.2"
+        [freeMouseWheelFactor]="0.01"
+        [zoomToFitZoomLevelFactor]="0.9"
+        [neutralZoomLevel]="neutralZoomLevel()"
+        (modelChange)="panzoomModel.set($event)"
+      >
         <div style="position: relative;">
-
           <img src="/myimage1.jpg">
-
         </div>
-
-      </pan-zoom>
-
+      </ngx-panzoom>
     </div>
-  `
+    
+    <!-- API by template reference -->
+    <button (click)="PanZoom.zoomOut('lastPoint')"></button>`
 })
-
 
 export class MyComponent {
   ...
-  panZoomConfig: PanZoomConfig = new PanZoomConfig();
-  ...
+  readonly panZoom = viewChild(PanZoomComponent);
+  readonly panzoomModel = signal<PanZoomModel>(undefined!);
+  
+  myMethod(): void {
+    // API by viewChild
+    this.panZoom().zoomIn('lastPoint');
+  }
 }
 ```
 
 ## Configuration
 
-You must first create and then pass in a configuration object (of type *PanZoomConfig*) via the `config` input property.  This configuration object also contains RXJS Observables which can be used to work with the API and also observe changes to the panzoom view.  The parameters can either be passed in as a PanZoomConfigOptions object, or set after the creation of the PanZoomConfig instance.
-
-```typescript
-panZoomConfig: PanZoomConfig = new PanZoomConfig(options?: PanZoomConfigOptions);
-```
+Configuration is set via property bindings on the `ngx-panzoom` element.
 
 The following attributes are defined:
 
 Name                                | Type      | Default           | Description
 ----------------------------------- | --------- | ----------------- | -----------
-api                                 | BehaviorSubject\<PanZoomAPI\>   | Not Applicable | Subscribe to this observable to obtain access to the API for controlling panzoom programattically.  See section below on getting at the API.
 zoomLevels                          | number    | 5                 | Number of discrete zoom levels, each one representing a scale.  The higher the number, the more zoomed in it is.
 neutralZoomLevel                    | number    | 2                 | The zoom level at which the contents render at 1:1 scale.
 scalePerZoomLevel                   | number    | 2.0               | The difference in actual scale between two adjacent zoom levels.
 initialZoomLevel                    | number    | neutralZoomLevel  | The initially selected zoom level.
 initialPanX                         | number    | 0                 | The initial pan in the horizontal direction.
 initialPanY                         | number    | 0                 | The initial pan in the vertical direction.
-initialZoomToFit                    | rectangle | null              | When defined, will initially zoom to fit the given rectangle (see API for explanation of zoom to fit). This overrides the initialZoomLevel, initialPanX, and initialPanY values.
+initialZoomToFit                    | Rect | null              | When defined, will initially zoom to fit the given rectangle (see API for explanation of zoom to fit). This overrides the initialZoomLevel, initialPanX, and initialPanY values.
 zoomToFitZoomLevelFactor            | number    | 0.95              | A number to indicate how closely zoom to fit will work. 1.0 is a perfect fit.  Lowering the number will reveal a bit of the surrounding contents.
 zoomOnDoubleClick                   | boolean   | true              | Enable or disable zooming in on double click.
 zoomButtonIncrement                 | number    | 1.0               | The number of zoom levels to zoom on double click.
@@ -197,7 +152,6 @@ freeMouseWheelFactor                | number    | 0.08              | How much t
 friction                            | number    | 10.0              | Constant which controls the friction when dragging and then letting go. The higher the number, the more quickly the animation will come to a stop.
 haltSpeed                           | number    | 100.0             | Constant which controls when the pan animation has slowed down enough to be terminated. The lower the number, the longer it will take to come to a stop.
 panOnClickDrag                      | boolean   | true              | Enable or disable pan on clicking and dragging the mouse.
-modelChanged                        | BehaviorSubject&lt;PanZoomModel>      | Not Applicable         | An RXJS observable which can be subscribed to in order to observe changes to the panzoom view. The model will be passed to the callback function.
 keepInBounds                        | boolean   | false             | When true, it will not be possible to pan the contents off the screen -- it will snap back when trying to do so.  It will not be possible to zoom further out than the neutral zoom level.  *REMEMBER* that the initial zoom level must either be less than or equal to the neutral zoom level, or weird things will happen.
 keepInBoundsRestoreForce            | number    | 0.5               | Constant to control how quickly the contents snap back into place after attempting to pan out of bounds.
 keepInBoundsDragPullback            | number    | 0.7               | Constant to control the perceived force preventing dragging the contents out of bounds.
@@ -206,13 +160,17 @@ noDragFromElementClass              | string    | null              | If set, th
 acceleratePan                       | boolean   | true              | Controls whether the pan frame will be hardware accelerated.
 dynamicContentDimensions                       | boolean   | false              | If true, a ResizeObserver will be used to detect changes in the content dimensions.  Useful if the content dimensions can't be predicted.  Alternatively, the API methods `detectContentDimensions()` or `contentDimensionsChanged()` can also be used.  ResizeObservers may not work in some older or mobile web browsers.  See https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver for info on browser compatibility.
 
+
+## Events
+
+Name | Type | Description
+----------------------------------- | --------- | -----------
+modelChange | PanZoomModel | Emits changes to the panZoom model.
+
+
 ## API
 
 The panzoom library provides an API for interacting with, observing, and controlling it.  The following methods and objects are available from the PanZoomAPI:
-
-  - `model: PanZoomModel`  - The current panzoom model - see the _PanZoomModel_ Interface below.
-
-  - `config: PanZoomConfig` - The current panzooom configuration.
 
   - `changeZoomLevel(newZoomLevel: number, clickPoint: Point)` - This method will reset the view to _newZoomLevel_, with _clickPoint_ as its centre point.
 
@@ -255,7 +213,7 @@ The panzoom library provides an API for interacting with, observing, and control
   - `updateContentDimensions([width: number], [height: number])` - Will update the content dimensions with the width and height values passed in.  Either parameter is optional.
 
 
-## PanZoom API Interfaces:
+## Interfaces
 
 ```typescript
 interface PanZoomModel {
@@ -274,72 +232,6 @@ interface Rect {
   y: number; // the y0 (top left) coordinate
   width: number; // the x1 (bottom right) coordinate
   height: number; // the y1 (bottom right) coordinate
-}
-```
-
-## Getting at the API
-
-The panzoom API is exposed through an RxJS observable as a property of the `PanZoomConfig` class, named `api`, to which you simply subscribe to obtain the API object.  The subscription callback method will be passed the API as its only parameter, of type `PanZoomAPI`.  Because it uses a BehaviorSubject, the callback will immediately trigger when subscribed to, assuming panzoom has already been initialised.  If panzoom hasn't yet been initialised, the subscription callback will fire as soon as initialisation occurs.
-
-```typescript
-import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ngx-panzoom';
-import { Subscription } from 'rxjs';
-
-@Component({ ... })
-
-export class MyComponent implements OnInit, OnDestroy {
- 
-  panZoomConfig: PanZoomConfig = new PanZoomConfig();
-  private panZoomAPI: PanZoomAPI;
-  private apiSubscription: Subscription;
-
-  ngOnInit(): void {
-    this.apiSubscription = this.panzoomConfig.api.subscribe( (api: PanZoomAPI) => this.panZoomAPI = api );
-  }
-
-  ngOnDestroy(): void {
-    this.apiSubscription.unsubscribe();  // don't forget to unsubscribe.  you don't want a memory leak!
-  }
-
-}
-```
-
-Now that we have our API stored in `this.panZoomAPI`, we can access it thusly:
-
-```typescript
-this.panZoomAPI.zoomIn();
-this.panZoomAPI.zoomOut();
-```
-
-
-## 'Events'
-
-The PanZoomConfig class has an RXJS observable (`modelChanged`) which can be used to monitor the pan/zoom state from another component.  The observable emits type `PanZoomModel` (see above section on API Interfaces).  For instance, when the zoom level reaches a certain level, you may want to display a custom control or content on your page.  Another use may be to do something when the panzoom centre point is over a certain part of the view.
-
-### Example modelChanged Subscription
-
-```typescript
-import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ngx-panzoom';
-
-@Component({ ... })
-
-export class MyComponent implements OnInit, OnDestroy {
- 
-  panZoomConfig: PanZoomConfig = new PanZoomConfig();
-  private modelChangedSubscription: Subscription;
-
-  ngOnInit(): void {
-    this.modelChangedSubscription = this.panzoomConfig.modelChanged.subscribe( (model: PanZoomModel) => this.onModelChanged(model) );
-  }
-
-  ngOnDestroy(): void {
-    this.modelChangedSubscription.unsubscribe();  // don't forget to unsubscribe.  you don't want a memory leak!
-  }
-
-  onModelChanged(model: PanZoomModel): void {
-    // do something after receiving your model update here
-  }
-
 }
 ```
 

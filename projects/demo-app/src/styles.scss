@@ -1,0 +1,154 @@
+/* You can add global styles to this file, and also import other style files */
+// @import 'font-awesome/css/font-awesome.min.css';
+@use 'font-awesome/css/font-awesome.min.css';
+@import 'primeflex/primeflex';
+
+html {
+  touch-action: none;
+  overflow: hidden;
+}
+
+body,
+html {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: black;
+}
+
+.noselect {
+  -webkit-touch-callout: none; // iOS Safari
+  -webkit-user-select: none; // Safari
+  -khtml-user-select: none; // Konqueror HTML
+  -moz-user-select: none; // Firefox
+  -ms-user-select: none; // Internet Explorer/Edge
+  user-select: none; // Non-prefixed version, currently supported by Chrome and Opera
+}
+
+
+
+:-webkit-full-screen,
+-moz-full-screen,
+fullscreen {
+  background-color: black;
+}
+
+
+
+* {
+  // Undo PrimeNG's global, and frankly ridiculous, box-sizing change
+  -moz-box-sizing: initial;
+  -webkit-box-sizing: initial;
+  box-sizing: initial;
+}
+
+
+
+.controls-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  
+  .button-box {
+    background-color: rgba(0, 0, 0, 0.8);
+    font-size: .75rem;
+    border-radius: .6rem;
+    row-gap: 1rem;
+    pointer-events: all;
+    
+    .d-pad-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 1em;
+      height: 6em;
+    
+      > div {
+        position: relative;
+        width: 10.166em
+      }
+    
+      .d-pad-text {
+        color: white;
+        font-size: 1.3em;
+        font-weight: bolder;
+      }
+    }
+  }
+
+  .panzoom-model-box {
+    padding: 1.5em;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 1em;
+    border-radius: .6em;
+  }
+}
+
+
+
+.icon {
+  background-color: rgb(75, 173, 243);
+  color: white;
+  border-radius: .4166em;
+  padding: 0.125em;
+  line-height: 1em;
+  & .icon-letter {
+    font-weight: bolder;
+  }
+}
+
+
+
+.icon-add-margin {
+  margin-left: .2rem;
+}
+
+
+
+.lock-screen {
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+  position: fixed;
+}
+
+
+
+.p-tooltip.p-component {
+  max-width: 40em;
+  white-space: pre-line;
+  
+  .p-tooltip-text {
+    border-radius: .6em;
+    padding: .7em;
+    font-weight: bolder;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.control-icon {
+  @extend .icon;
+  @extend .fa;
+  @extend .fa-2x;
+  @extend .fa-fw;
+  @extend .clickable;
+}
+
+.rotate-45 {
+  transform: rotate(45deg);
+}
+
+.rotate-45neg {
+  transform: rotate(-45deg);
+}
+
+.v-hidden {
+  visibility: hidden;
+}

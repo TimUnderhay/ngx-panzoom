@@ -2,32 +2,33 @@
   "compileOnSave": false,
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "./dist/out-tsc",
+    "outDir": "./dist",
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
     "experimentalDecorators": true,
     "module": "es2022",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "importHelpers": true,
     "target": "es2022",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "noImplicitOverride": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
     "lib": [
       "es2022",
       "dom"
     ],
     "paths": {
-      "ngx-panzoom": [
-        "dist/ngx-panzoom/ngx-panzoom",
-        "dist/ngx-panzoom"
-      ]
+      "ngx-panzoom": ["./projects/ngx-panzoom/src/public-api"]
     },
-    "allowSyntheticDefaultImports": true
+    "noImplicitAny": true,
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
+    "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true

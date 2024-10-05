@@ -1,5 +1,11 @@
 # Change Log
 
+# 19.0.0
+- Replaced RxJS API with component-based API.
+- Compatible with Angular >= 18.
+- Demo app now part of this repo.
+- Added selector `ngx-panzoom`.
+
 # 18.0.0
 - Updated for Angular 18.x.x.
 
