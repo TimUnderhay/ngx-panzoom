@@ -1,3 +1,10 @@
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
+# Deprecated
+There are no plans to support ngx-panzoom beyond version 19.  PR's may still be accepted, though.
+
+Why?  I no longer use this library in any projects of my own, and life is too busy to give it any further attention.  I have solicited PR's from the community for missing functionality, especially around mobile support, but almost none have been forthcoming.
+
 # ngx-panzoom
 
 An Angular component for panning and zooming an element or elements using the mouse and mousewheel.  Provides rudimentary support for touchscreens (read section on mobile support).  It was adapted from the angular-pan-zoom library for AngularJS, but it has been heavily modified.  Many thanks go out to Martin Vindahl Olsen for having written it, and for his blessing.
@@ -5,9 +12,6 @@ An Angular component for panning and zooming an element or elements using the mo
 It is built using Angular CLI.  It is only tested with the corresponding version of Angular.
 
 This library deliberately parts with certain received Angular wisdom of using only Angular-ish methods to accomplish things.  We use native event listeners.  We apply CSS transforms directly to the DOM.  But as this library doesn't fit the traditional Angular model, as its purpose is only to apply CSS transforms to a certain part of the DOM, without moving or changing anything else, it has no impact on an application's state (except if the app consumes `modelChanged` observables).  By using this approach, it is hoped that performance will be maximised.
-
-# End Of Life
-There are no plans to support ngx-panzoom beyond version 19.  PR's may still be accepted, though.
 
 ## Version 19 Compatibility
 Version 19 is compatible with Angular 18 and up.  Assuming Angular's API doesn't significantly change in future releases, this library should continue to function.
